@@ -5,9 +5,13 @@ import (
 	"github.com/bwmarrin/snowflake"
 )
 
+const (
+	maxNode = 1023
+)
+
 func GetSnowflakeId() snowflake.ID {
 	// Create a new Node with a Node number of 1
-	node, err := snowflake.NewNode(1)
+	node, err := snowflake.NewNode(maxNode)
 	if err != nil {
 		fmt.Println(err)
 		return 0
