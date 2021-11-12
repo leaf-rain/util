@@ -6,5 +6,5 @@ import (
 
 func TestGetLogger(t *testing.T) {
 	log := GetLogger()
-	log.Info("test")
+	log.Error("test")
 }

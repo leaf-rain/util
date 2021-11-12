@@ -5,6 +5,8 @@ go 1.16
 require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/OneOfOne/xxhash v1.2.8
+	github.com/bitly/go-simplejson v0.5.0
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/natefinch/lumberjack v2.0.0+incompatible
