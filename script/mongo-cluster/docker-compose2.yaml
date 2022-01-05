@@ -1,0 +1,78 @@
+version: '2'
+services:
+  shard1:
+    image: mongo:4.4.10
+    command: mongod --shardsvr --directoryperdb --replSet shard1
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/shard1:/data/db
+    privileged: true
+    mem_limit: 16000000000
+    networks:
+      - mongo
+
+  shard2:
+    image: mongo:4.4.10
+    command: mongod --shardsvr --directoryperdb --replSet shard2
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/shard2:/data/db
+    privileged: true
+    mem_limit: 16000000000
+    networks:
+      - mongo
+
+  shard3:
+    image: mongo:4.4.10
+    command: mongod --shardsvr --directoryperdb --replSet shard3
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/shard3:/data/db
+    privileged: true
+    mem_limit: 16000000000
+    networks:
+      - mongo
+
+  config1:
+    image: mongo:4.4.10
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/config1:/data/configdb
+    networks:
+      - mongo
+
+  config2:
+    image: mongo:4.4.10
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/config2:/data/configdb
+    networks:
+      - mongo
+
+  config3:
+    image: mongo:4.4.10
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./dbs/config3:/data/configdb
+    networks:
+      - mongo
+
+  mongos:
+    image: mongo:4.4.10
+    command: mongos --configdb fates-mongo-config/config1:27019,config2:27019,config3:27019 --bind_ip 0.0.0.0 --port 27017
+    ports:
+      - 27017:27017
+    volumes:
+      - /etc/localtime:/etc/localtime
+    depends_on:
+      - config1
+      - config2
+      - config3
+    networks:
+      - mongo
+networks:
+  mongo:
+    external: true

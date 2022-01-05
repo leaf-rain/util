@@ -1,28 +1,28 @@
 version: '3'
 services:
-    mongo:
-        image: mongo
-        container_name: mongo-server
-        volumes:
-            - ./mongo/db:/data/db   # /data/db是container中存放数据位置
-        ports:
-            - 27017:27017
-        environment:
-            ME_CONFIG_BASICAUTH_USERNAME: root
-            ME_CONFIG_BASICAUTH_PASSWORD: password
-        #restart: always
-
-    mongo-express:
-        links:
-            - mongo  # 这里关联到mongo的container
-        image: mongo-express
-        container_name: mongo-express-server
-        #restart: always
-        ports:
-            - 8081:8081
-        environment:
-            ME_CONFIG_BASICAUTH_USERNAME: root
-            ME_CONFIG_BASICAUTH_PASSWORD: password
+#    mongo:
+#        image: mongo
+#        container_name: mongo-server
+#        volumes:
+#            - ./mongo/db:/data/db   # /data/db是container中存放数据位置
+#        ports:
+#            - 27017:27017
+#        environment:
+#            ME_CONFIG_BASICAUTH_USERNAME: root
+#            ME_CONFIG_BASICAUTH_PASSWORD: password
+#        #restart: always
+#
+#    mongo-express:
+#        links:
+#            - mongo  # 这里关联到mongo的container
+#        image: mongo-express
+#        container_name: mongo-express-server
+#        #restart: always
+#        ports:
+#            - 8081:8081
+#        environment:
+#            ME_CONFIG_BASICAUTH_USERNAME: root
+#            ME_CONFIG_BASICAUTH_PASSWORD: password
 
 #    mysql:
     #        image: mysql
@@ -37,13 +37,13 @@ services:
     #            - ./mysql/conf.d:/etc/mysql/conf.d
     #        environment:
     #            MYSQL_ROOT_PASSWORD: password
-
-    adminer:
-        image: adminer
-        container_name: adminer-server
-        #restart: always
-        ports:
-            - 8080:8080
+#
+#    adminer:
+#        image: adminer
+#        container_name: adminer-server
+#        #restart: always
+#        ports:
+#            - 8080:8080
 
     redis:
         image: redis
