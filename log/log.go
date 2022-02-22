@@ -19,6 +19,7 @@ type Options struct {
 	MaxBackups int    `yaml:"maxBackups"` //保留文件个数
 	MaxAge     int    `yaml:"maxAge"`     //文件保留最大实际
 	Level      string `yaml:"level"`
+	ToFile     bool   `yaml:"toFile"` // 是否写到文件
 }
 
 var (
@@ -144,15 +145,11 @@ func (l *Logger) cores() zap.Option {
 	priority := zap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
 		return lvl >= l.GetLevel()
 	})
-	var cores []zapcore.Core
-	if l.GetLevel() == zapcore.DebugLevel {
-		cores = append(cores, []zapcore.Core{
-			zapcore.NewCore(consoleEncoder, debugConsoleWS, priority),
-		}...)
-	} else {
-		cores = append(cores, []zapcore.Core{
-			zapcore.NewCore(fileEncoder, outWrite, priority),
-		}...)
+	var cores = []zapcore.Core{
+		zapcore.NewCore(consoleEncoder, debugConsoleWS, priority),
+	}
+	if l.Opts.ToFile {
+		cores = append(cores, zapcore.NewCore(fileEncoder, outWrite, priority))
 	}
 	return zap.WrapCore(func(c zapcore.Core) zapcore.Core {
 		return zapcore.NewTee(cores...)

@@ -16,10 +16,18 @@ type Pagination struct {
 }
 
 type SortSet interface {
+	// 添加元素
 	CacheIndexAdd(ctx context.Context, key string, value []*redis.Z) (result int64, err error)
+	// 查询，通过分页
 	CacheIndexGetByOrder(ctx context.Context, key string, page *Pagination) (result []string, err error)
+	// 查询，通过分数分页
 	CacheIndexGetByScore(ctx context.Context, key string, page *Pagination) (result []string, err error)
+	// 获取有序集合数量
 	CacheGetSortSetCount(ctx context.Context, key string) (result int64, err error)
+	// 判断元素是否存在有序集合
+	CacheExistsSortSet(ctx context.Context, key, value string) (result bool, err error)
+	// 删除有序集合元素
+	CacheDelMember(ctx context.Context, key, value string) (err error)
 }
 
 type sortSet struct {
@@ -41,7 +49,7 @@ func (r *sortSet) CacheIndexGetByOrder(ctx context.Context, key string, page *Pa
 		return nil, redis.Nil
 	}
 	var resp []string
-	resp, err = r.redis.ZRevRange(ctx, key, page.Offset, (page.Offset + page.Limit - 1)).Result()
+	resp, err = r.redis.ZRevRange(ctx, key, page.Offset+1, (page.Offset + page.Limit)).Result()
 	page.TotalRows, err = r.CacheGetSortSetCount(ctx, key)
 	return resp, err
 }
@@ -72,4 +80,24 @@ func (r *sortSet) CacheGetSortSetCount(ctx context.Context, key string) (result 
 		return 0, redis.Nil
 	}
 	return r.redis.ZCard(ctx, key).Result()
+}
+
+func (r *sortSet) CacheExistsSortSet(ctx context.Context, key, value string) (result bool, err error) {
+	if r.redis.Exists(ctx, key).Val() != 1 {
+		return false, redis.Nil
+	}
+	value = "[" + value
+	var count int64
+	count, err = r.redis.ZLexCount(ctx, key, value, value).Result()
+	if count == 1 {
+		return true, nil
+	}
+	return false, nil
+}
+func (r *sortSet) CacheDelMember(ctx context.Context, key, value string) (err error) {
+	if r.redis.Exists(ctx, key).Val() != 1 {
+		return redis.Nil
+	}
+	_, err = r.redis.ZRem(ctx, key, value).Result()
+	return nil
 }

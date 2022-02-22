@@ -36,6 +36,7 @@ func TestSortSet_CacheSortSet(t *testing.T) {
 	var err error
 	var result []string
 	var resultInt int64
+	var resultBool bool
 	var key = "test_sort_set"
 	if _, err = sortSetInterface.CacheIndexAdd(ctx, key, []*rd.Z{
 		{1, 1},
@@ -71,4 +72,10 @@ func TestSortSet_CacheSortSet(t *testing.T) {
 	} else {
 		fmt.Println("CacheGetSortSetCount success", resultInt)
 	}
+	if resultBool, err = sortSetInterface.CacheExistsSortSet(ctx, key, "8"); err != nil {
+		fmt.Errorf("CacheExistsSortSet failed, %v", err)
+	} else {
+		fmt.Println("CacheExistsSortSet success", resultBool)
+	}
+
 }

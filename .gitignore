@@ -17,3 +17,4 @@
 .idea
 db/
 etcd_db/
+logs
