@@ -2,6 +2,7 @@ package redisCache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"math"
@@ -86,13 +87,14 @@ func (r *sortSet) CacheExistsSortSet(ctx context.Context, key, value string) (re
 	if r.redis.Exists(ctx, key).Val() != 1 {
 		return false, redis.Nil
 	}
-	value = "[" + value
-	var count int64
-	count, err = r.redis.ZLexCount(ctx, key, value, value).Result()
-	if count == 1 {
-		return true, nil
+	_, err = r.redis.ZRank(ctx, key, value).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return false, nil
+		}
+		return false, err
 	}
-	return false, nil
+	return true, nil
 }
 func (r *sortSet) CacheDelMember(ctx context.Context, key, value string) (err error) {
 	if r.redis.Exists(ctx, key).Val() != 1 {

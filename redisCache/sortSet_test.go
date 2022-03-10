@@ -63,17 +63,17 @@ func TestSortSet_CacheSortSet(t *testing.T) {
 		Offset:    1,
 		TotalRows: 0,
 	}); err != nil {
-		fmt.Errorf("CacheIndexGetByOrder failed, %v", err)
+		fmt.Println(fmt.Errorf("CacheIndexGetByOrder failed, %v", err))
 	} else {
 		fmt.Println("CacheIndexGetByOrder success", result)
 	}
 	if resultInt, err = sortSetInterface.CacheGetSortSetCount(ctx, key); err != nil {
-		fmt.Errorf("CacheGetSortSetCount failed, %v", err)
+		fmt.Println(fmt.Errorf("CacheGetSortSetCount failed, %v", err))
 	} else {
 		fmt.Println("CacheGetSortSetCount success", resultInt)
 	}
-	if resultBool, err = sortSetInterface.CacheExistsSortSet(ctx, key, "8"); err != nil {
-		fmt.Errorf("CacheExistsSortSet failed, %v", err)
+	if resultBool, err = sortSetInterface.CacheExistsSortSet(ctx, key, "7"); err != nil {
+		fmt.Println(fmt.Errorf("CacheExistsSortSet failed, %v", err))
 	} else {
 		fmt.Println("CacheExistsSortSet success", resultBool)
 	}
