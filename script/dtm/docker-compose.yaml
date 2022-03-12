@@ -1,0 +1,14 @@
+version: '3'
+services:
+  dtm:
+    image: yedf/dtm
+    container_name: dtm
+    environment:
+      STORE_DRIVER: redis
+      STORE_HOST: redis-server
+      STORE_USER: ''
+      STORE_PASSWORD: ''
+      STORE_PORT: 6379
+    ports:
+      - '36789:36789'
+      - '36790:36790'

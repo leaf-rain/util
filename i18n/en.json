@@ -1,0 +1,12 @@
+{
+  "hello_world": {
+    "description": "The number of messages a person has",
+    "one": "hello_world",
+    "other": "hello_world"
+  },
+  "messages": {
+    "description": "The number of messages a person has",
+    "one": "{{.Name}} has {{.Count}} message.",
+    "other": "{{.Name}} has {{.Count}} messages."
+  }
+}
