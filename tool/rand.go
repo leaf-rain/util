@@ -21,9 +21,9 @@ func RandStringRunes(n int) string {
 
 func RandInt64(min, max int64) int64 {
 	rand.Seed(time.Now().UnixNano())
-	if min >= max || min == 0 || max == 0 {
-		min = 1
-		max = 100
-	}
+	//if min >= max || min == 0 || max == 0 {
+	//	min = 1
+	//	max = 100
+	//}
 	return rand.Int63n(max-min) + min
 }

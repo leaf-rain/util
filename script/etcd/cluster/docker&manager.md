@@ -35,7 +35,7 @@ services:
     # build: .
     image: "shiguanghuxian/etcd-manage:1"
     volumes:
-      - ./bin/config/cfg.toml:/app/config/cfg.toml
+      - ./bin/lang/cfg.toml:/app/lang/cfg.toml
       - ./bin/logs:/app/logs
     ports:
       - "10280:10280"

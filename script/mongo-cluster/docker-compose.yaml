@@ -42,7 +42,7 @@ services:
     image: mongo:4.4.10
     container_name: mongo_config1
     # --configsvr: 这个参数仅仅是将默认端口由27017改为27019, 如果指定--port可不添加该参数
-    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-lang
     volumes:
       - /etc/localtime:/etc/localtime
       - ./dbs/config1:/data/configdb
@@ -52,7 +52,7 @@ services:
   config2:
     image: mongo:4.4.10
     container_name: mongo_config2
-    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-lang
     volumes:
       - /etc/localtime:/etc/localtime
       - ./dbs/config2:/data/configdb
@@ -62,7 +62,7 @@ services:
   config3:
     image: mongo:4.4.10
     container_name: mongo_config3
-    command: mongod --configsvr --directoryperdb --replSet fates-mongo-config
+    command: mongod --configsvr --directoryperdb --replSet fates-mongo-lang
     volumes:
       - /etc/localtime:/etc/localtime
       - ./dbs/config3:/data/configdb
@@ -73,7 +73,7 @@ services:
     image: mongo:4.4.10
     container_name: mongo_mongos
     # mongo3.6版默认绑定IP为127.0.0.1，此处绑定0.0.0.0是允许其他容器或主机可以访问
-    command: mongos --configdb fates-mongo-config/config1:27019,config2:27019,config3:27019 --bind_ip 0.0.0.0 --port 27017
+    command: mongos --configdb fates-mongo-lang/config1:27019,config2:27019,config3:27019 --bind_ip 0.0.0.0 --port 27017
     ports:
       - 27017:27017
     volumes:

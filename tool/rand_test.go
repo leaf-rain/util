@@ -31,6 +31,6 @@ func TestRandStringRunes(t *testing.T) {
 }
 
 func TestRandInt64(t *testing.T) {
-	num := RandInt64(1, 100)
+	num := RandInt64(0, 2)
 	fmt.Println(num)
 }
