@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  apollo-configservice:
+    container_name: apollo-configservice
+    image: apolloconfig/apollo-configservice
+    volumes:
+      - $PWD/logs/configservice:/opt/logs
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://192.168.2.45:3306/ApolloConfigDB?characterEncoding=utf8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+  #      - EUREKA_INSTANCE_HOME_PAGE_URL=http://192.168.1.15:8080
+
+  apollo-adminservice:
+    depends_on:
+      - apollo-configservice
+    container_name: apollo-adminservice
+    image: apolloconfig/apollo-adminservice
+    volumes:
+      - $PWD/logs/adminservice:/opt/logs
+    ports:
+      - 8090:8090
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://192.168.2.45:3306/ApolloConfigDB?characterEncoding=utf8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+
+
+  apollo-portal:
+    depends_on:
+      - apollo-adminservice
+    container_name: apollo-portal
+    image: apolloconfig/apollo-portal
+    volumes:
+      - $PWD/logs/portal:/opt/logs
+    ports:
+      - 8070:8070
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://192.168.2.45:3306/ApolloPortalDB?characterEncoding=utf8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - APOLLO_PORTAL_ENVS=dev  # 激活环境类型
+      - DEV_META=http://192.168.2.45:8080  # 配置中心地址， 即 configservice 地址

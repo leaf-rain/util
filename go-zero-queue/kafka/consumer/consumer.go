@@ -21,7 +21,7 @@ func main() {
 			},
 			Mode: "",
 		},
-		Brokers:    []string{"192.168.2.62:9092"},
+		Brokers:    []string{"192.168.1.111:9092"},
 		Group:      "payment-update-paystatus-group",
 		Topic:      "payment-update-paystatus-topic",
 		Offset:     "first",

@@ -8,11 +8,12 @@ require (
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
-	github.com/gin-gonic/gin v1.7.7
 	github.com/go-redis/redis/v8 v8.11.4
+	github.com/imdario/mergo v0.3.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nicksnyder/go-i18n/v2 v2.2.0
-	github.com/pelletier/go-toml v1.7.0 // indirect
+	github.com/shima-park/agollo v1.2.12
+	github.com/spf13/viper v1.8.1
 	github.com/tsuna/gohbase v0.0.0-20210915142822-2d0b4a649730
 	github.com/vmihailenco/bufpool v0.1.11
 	github.com/vmihailenco/go-tinylfu v0.2.2
