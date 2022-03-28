@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/zeromicro/go-queue/kq"
+	"github.com/zeromicro/go-zero/core/cmdline"
 	"log"
 	"math/rand"
 	"strconv"
@@ -18,7 +19,7 @@ type message struct {
 }
 
 func main() {
-	var pusher = kq.NewPusher([]string{"192.168.1.111:9092"}, "payment-update-paystatus-topic")
+	var pusher = kq.NewPusher([]string{"192.168.1.111:9092"}, "sysconfig_topic")
 	count := rand.Intn(100)
 	// 准备消息
 	m := message{
@@ -36,5 +37,5 @@ func main() {
 	if err := pusher.Push(string(body)); err != nil {
 		log.Fatal(err)
 	}
-	//cmdline.EnterToContinue()
+	cmdline.EnterToContinue()
 }

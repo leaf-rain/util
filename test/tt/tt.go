@@ -1,8 +1,14 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"sync"
+)
 
 func main() {
-
-	log.Printf("ttttt %s", "eee")
+	var m sync.Map
+	m.Store(1, 1)
+	fmt.Println(m.Load(1))
+	m = sync.Map{}
+	fmt.Println(m.Load(1))
 }
