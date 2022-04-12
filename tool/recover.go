@@ -1,7 +1,7 @@
 package tool
 
 import (
-	"github.com/zeromicro/go-zero/core/logx"
+	"log"
 	"runtime"
 	"runtime/debug"
 )
@@ -12,7 +12,7 @@ const (
 
 func Recover() {
 	if err := recover(); err != nil {
-		logx.Errorf("panic recover, err: %v", err)
+		log.Printf("panic recover, err: %v", err)
 		debug.PrintStack()
 	}
 }
