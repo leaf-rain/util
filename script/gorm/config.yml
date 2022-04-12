@@ -1,0 +1,29 @@
+out_dir: "."  # out dir
+url_tag: json # web url tag(json,db(https://github.com/google/go-querystring))
+language:  # language(English,中 文)
+db_tag: gorm # DB tag(gorm,db)
+simple: false #simple output
+is_out_sql: false # Whether to output sql
+is_out_func: true # Whether to output function
+is_foreign_key: true # Whether to mark foreign key or not
+is_gui: false # Whether to operate on gui
+is_table_name: false # Whether to out GetTableName/column function
+is_null_to_point: false # database is 'DEFAULT NULL' then set element type as point
+is_web_tag: false
+is_web_tag_pk_hidden: false
+table_prefix: "" #table prefix
+table_names: "temporary_storage" # Specified table generation, multiple tables with , separated
+is_column_name: true # Whether to generate column names
+is_out_file_by_table_name: false # Whether to generate multiple models based on table names
+db_info:
+  host: "192.168.1.111"
+  port: 3306
+  username: "root"
+  password: "master"
+  database: "vchat_stats"
+  type: 0 # database type (0:mysql , 1:sqlite , 2:mssql)
+self_type_define: # Custom data type mapping
+  datetime: time.Time
+  date: time.Time
+out_file_name: "" # Custom build file name
+web_tag_type: 0 # json tag 0: Small Camel-Case 1: _

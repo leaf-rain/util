@@ -9,11 +9,9 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/go-redis/redis/v8 v8.11.4
-	github.com/imdario/mergo v0.3.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nicksnyder/go-i18n/v2 v2.2.0
 	github.com/shima-park/agollo v1.2.12
-	github.com/spf13/viper v1.8.1
 	github.com/tsuna/gohbase v0.0.0-20210915142822-2d0b4a649730
 	github.com/vmihailenco/bufpool v0.1.11
 	github.com/vmihailenco/go-tinylfu v0.2.2
@@ -29,8 +27,9 @@ require (
 	golang.org/x/text v0.3.7
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
+	gorm.io/driver/clickhouse v0.3.1
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.21.15
+	gorm.io/gorm v1.23.1
 	k8s.io/api v0.23.1
 	k8s.io/apimachinery v0.23.1
 	k8s.io/client-go v0.23.1

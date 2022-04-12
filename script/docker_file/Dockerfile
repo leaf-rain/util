@@ -9,8 +9,8 @@ RUN go get -u golang.org/x/lint/golint
 RUN curl -O https://get.docker.com/builds/Linux/x86_64/docker-latest.tgz \
     && tar zxvf docker-latest.tgz \
     && cp docker/docker /usr/local/bin/ \
-    && rm -rf docker docker-latest.tgz
+    && rm -rf docker docker-latest.tgz && mkdir -p /etc/docker
+RUN echo $'{"registry-mirrors": ["https://q3u0qv3z.mirror.aliyuncs.com"],"insecure-registries":["192.168.2.200:5000"]}' > /etc/docker/daemon.json
 
 # install expect
-RUN apt-get update
-RUN apt-get -y install tcl tk expect
+RUN apt-get update && apt-get -y install tcl tk expect
