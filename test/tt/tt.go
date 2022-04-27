@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"time"
-	"unsafe"
 )
 
 const TIME_LAYOUT = "2006-01-02 15:04:05"
@@ -16,9 +16,16 @@ type ttt struct {
 }
 
 func main() {
-	var f float64 = 100.0014
-	fmt.Println(*(*uint64)(unsafe.Pointer(&f)))
-	fmt.Println(int64(f))
+	fmt.Println(RandInt64(0, 2))
+}
+
+func RandInt64(min, max int64) int64 {
+	rand.Seed(time.Now().UnixNano())
+	//if min >= max || min == 0 || max == 0 {
+	//	min = 1
+	//	max = 100
+	//}
+	return rand.Int63n(max-min) + min
 }
 
 //判断时间是当年的第几周

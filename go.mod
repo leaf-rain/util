@@ -5,10 +5,12 @@ go 1.16
 require (
 	github.com/OneOfOne/xxhash v1.2.8
 	github.com/apolloconfig/agollo/v4 v4.0.11
+	github.com/aws/aws-sdk-go v1.27.0
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/go-redis/redis/v8 v8.11.4
+	github.com/leaf-rain/log v0.0.2
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nicksnyder/go-i18n/v2 v2.2.0
 	github.com/shima-park/agollo v1.2.12
@@ -27,7 +29,6 @@ require (
 	golang.org/x/text v0.3.7
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
-	gorm.io/driver/clickhouse v0.3.1
 	gorm.io/driver/mysql v1.1.2
 	gorm.io/gorm v1.23.1
 	k8s.io/api v0.23.1
