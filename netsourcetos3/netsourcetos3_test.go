@@ -7,11 +7,9 @@ import (
 )
 
 var conf = S3Config{
-	AccessKey: "AKIA5DQBT52JAQPARCUV",
-	SecretKey: "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",
-	Token:     "",
-	EndPoint:  "s3.amazonaws.com",
-	Region:    "ap-south-1",
+	Token:    "",
+	EndPoint: "s3.amazonaws.com",
+	Region:   "ap-south-1",
 }
 
 var url = "http://img2.bdstatic.com/img/image/166314e251f95cad1c8f496ad547d3e6709c93d5197.jpg"
