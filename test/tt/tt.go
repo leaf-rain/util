@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math"
-	"math/rand"
-	"time"
+	"strings"
 )
 
 const TIME_LAYOUT = "2006-01-02 15:04:05"
@@ -15,80 +13,36 @@ type ttt struct {
 	C float64
 }
 
+var replySpecificKeys = []uint8{1, 2, 3}
+
+func replyGetTy() uint8 {
+	if len(replySpecificKeys) == 0 {
+		return 0
+	}
+	replySpecificKeys = append(replySpecificKeys[1:], replySpecificKeys[0])
+	return replySpecificKeys[0]
+}
+
 func main() {
-	fmt.Println(RandInt64(0, 2))
-}
-
-func RandInt64(min, max int64) int64 {
-	rand.Seed(time.Now().UnixNano())
-	//if min >= max || min == 0 || max == 0 {
-	//	min = 1
-	//	max = 100
-	//}
-	return rand.Int63n(max-min) + min
-}
-
-//判断时间是当年的第几周
-func WeekByDate(t time.Time) string {
-	yearDay := t.YearDay()
-	yearFirstDay := t.AddDate(0, 0, -yearDay+1)
-	firstDayInWeek := int(yearFirstDay.Weekday())
-
-	//今年第一周有几天
-	firstWeekDays := 1
-	if firstDayInWeek != 0 {
-		firstWeekDays = 7 - firstDayInWeek + 1
+	for i := int64(1); i <= 15; i++ {
+		fmt.Println(i)
 	}
-	var week int
-	if yearDay <= firstWeekDays {
-		week = 1
+}
+
+func charEncry(name []string, end int) string {
+	var length = len(name)
+	var encry = "***"
+	if length < 5 {
+		var right int
+		if length >= 3 {
+			right = 3
+		} else {
+			right = length
+		}
+		return strings.Join(name[:right], "") + encry
 	} else {
-		week = (yearDay-firstWeekDays)/7 + 2
+		return strings.Join(name[:3], "") + encry + strings.Join(name[length-end:], "")
 	}
-	return fmt.Sprintf("%d第%d周", t.Year(), week)
-}
-
-type WeekDate struct {
-	WeekTh    string
-	StartTime time.Time
-	EndTime   time.Time
-}
-
-// 将开始时间和结束时间分割为周为单位
-func GroupByWeekDate(startTime, endTime time.Time) []WeekDate {
-	weekDate := make([]WeekDate, 0)
-	diffDuration := endTime.Sub(startTime)
-	days := int(math.Ceil(float64(diffDuration/(time.Hour*24)))) + 1
-
-	currentWeekDate := WeekDate{}
-	currentWeekDate.WeekTh = WeekByDate(endTime)
-	currentWeekDate.EndTime = endTime
-	currentWeekDay := int(endTime.Weekday())
-	if currentWeekDay == 0 {
-		currentWeekDay = 7
-	}
-	currentWeekDate.StartTime = endTime.AddDate(0, 0, -currentWeekDay+1)
-	nextWeekEndTime := currentWeekDate.StartTime
-	weekDate = append(weekDate, currentWeekDate)
-
-	for i := 0; i < (days-currentWeekDay)/7; i++ {
-		weekData := WeekDate{}
-		weekData.EndTime = nextWeekEndTime
-		weekData.StartTime = nextWeekEndTime.AddDate(0, 0, -7)
-		weekData.WeekTh = WeekByDate(weekData.StartTime)
-		nextWeekEndTime = weekData.StartTime
-		weekDate = append(weekDate, weekData)
-	}
-
-	if lastDays := (days - currentWeekDay) % 7; lastDays > 0 {
-		lastData := WeekDate{}
-		lastData.EndTime = nextWeekEndTime
-		lastData.StartTime = nextWeekEndTime.AddDate(0, 0, -lastDays)
-		lastData.WeekTh = WeekByDate(lastData.StartTime)
-		weekDate = append(weekDate, lastData)
-	}
-
-	return weekDate
 }
 
 func CheckRepeatForList(l1, l2 []uint64) ([]uint64, float64) {

@@ -5,6 +5,7 @@ import (
 	"golang.org/x/text/language"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestInit(t *testing.T) {
@@ -12,5 +13,9 @@ func TestInit(t *testing.T) {
 	fmt.Println(atI18n.mustGetMessage("hello_world"))
 	ids := GetIds()
 	id := ids[rand.Intn(len(ids))]
-	fmt.Println(MustGetMessage(id, "en"))
+	for {
+		fmt.Println(MustGetMessage(id, "en"))
+		time.Sleep(time.Second * 2)
+		Init("./lang", language.English)
+	}
 }

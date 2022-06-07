@@ -12,7 +12,7 @@ is_null_to_point: false # database is 'DEFAULT NULL' then set element type as po
 is_web_tag: false
 is_web_tag_pk_hidden: false
 table_prefix: "" #table prefix
-table_names: "report" # Specified table generation, multiple tables with , separated
+table_names: "register_user_stats" # Specified table generation, multiple tables with , separated
 is_column_name: true # Whether to generate column names
 is_out_file_by_table_name: false # Whether to generate multiple models based on table names
 db_info:
@@ -20,7 +20,7 @@ db_info:
   port: 3306
   username: "root"
   password: "master"
-  database: "vchat_main"
+  database: "vchat_stats"
   type: 0 # database type (0:mysql , 1:sqlite , 2:mssql)
 self_type_define: # Custom data type mapping
   datetime: time.Time
