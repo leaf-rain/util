@@ -2,86 +2,22 @@ package main
 
 import (
 	"fmt"
-	"reflect"
-	"strings"
 )
 
-const TIME_LAYOUT = "2006-01-02 15:04:05"
-
-type ttt struct {
-	A string
-	B string
-	C float64
-}
-
-var replySpecificKeys = []uint8{1, 2, 3}
-
-func replyGetTy() uint8 {
-	if len(replySpecificKeys) == 0 {
-		return 0
-	}
-	replySpecificKeys = append(replySpecificKeys[1:], replySpecificKeys[0])
-	return replySpecificKeys[0]
-}
-
-func app(list []uint8) {
-	replySpecificKeys = append(list, 4, 5, 6)
-}
-
-type t1 interface {
-	ToString1()
-}
-
-// 声明一个空结构体
-type cat struct {
-	Name string
-	// 带有结构体tag的字段
-	Type int `json:"type" id:"100"`
-}
-
-type t2 interface {
-	ToString2()
-}
-
-func (c cat) ToString1() {
-	fmt.Println(c.Name)
-}
-func (c cat) ToString2() {
-	fmt.Println(c.Name)
+func mapIndex(x, y uint64) uint64 {
+	return y*1000 + x
 }
 
 func main() {
-	var req = struct {
-		Name string
-		Age  int
-	}{Name: "张三", Age: 1000}
-	var typeOf = reflect.TypeOf(req)
-	var valueOf = reflect.ValueOf(req)
-	var length = typeOf.NumField()
-	var value = make([]interface{}, length*2)
-	var name string
-	for i := 0; i < length; i++ {
-		name = typeOf.Field(i).Name
-		value[i*2] = name
-		value[i*2+1] = valueOf.FieldByName(name)
+	var x, y uint64 = 3, 3
+	var width, high uint64 = 3, 4
+	var area = make([][2]uint64, high)
+	var index = 0
+	for i := y; i < y+high; i++ {
+		area[index] = [2]uint64{mapIndex(x, i), mapIndex(x+width-1, i)}
+		index++
 	}
-	fmt.Printf("%+v", value)
-}
-
-func charEncry(name []string, end int) string {
-	var length = len(name)
-	var encry = "***"
-	if length < 5 {
-		var right int
-		if length >= 3 {
-			right = 3
-		} else {
-			right = length
-		}
-		return strings.Join(name[:right], "") + encry
-	} else {
-		return strings.Join(name[:3], "") + encry + strings.Join(name[length-end:], "")
-	}
+	fmt.Println(area)
 }
 
 func CheckRepeatForList(l1, l2 []uint64) ([]uint64, float64) {

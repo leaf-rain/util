@@ -2,57 +2,79 @@ package redis
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
+	"reflect"
 	"testing"
 	"time"
 )
 
+type un int64
+
+type st struct {
+	Name string `redis:"Name"`
+	Age  int64  `redis:"Age"`
+	Un   un     `redis:"Un"`
+}
+
+var ErrUnknownType = errors.New("未知类型")
+
 func TestNew(t *testing.T) {
-	fmt.Println("1", time.Now().Format("2006-01-02 15:04:05"))
 	var ctx = context.Background()
 	cli, err := NewRedis(Config{
 		PoolSize: 5,
 		Addr: []string{
-			"172.13.3.160:7001",
-			"172.13.3.160:7002",
-			"172.13.3.160:7003",
+			"127.0.0.1:6379",
 		},
 		DialTimeout: time.Second * 10,
 	}, ctx)
 	if err != nil {
 		panic(err)
 	}
-	/*cli.ZAdd("test_z", redis.Z{
-		Score:  1,
-		Member: "A",
-	})
-	cli.ZAdd("test_z", redis.Z{
-		Score:  2,
-		Member: "B",
-	})
-	cli.ZAdd("test_z", redis.Z{
-		Score:  3,
-		Member: "C",
-	})
-	cli.ZAdd("test_z", redis.Z{
-		Score:  4,
-		Member: "D",
-	})
-	cli.ZAdd("test_z", redis.Z{
-		Score:  5,
-		Member: "F",
-	})*/
-	cacheMsgKey := make([]string, 0)
-	offset := "+inf"
-	err = cli.ZRevRangeByScore(ctx, "test_z", &redis.ZRangeBy{
-		Min:    "-inf",
-		Max:    offset,
-		Offset: 0,
-		Count:  0,
-	}).ScanSlice(&cacheMsgKey)
-	if err != nil {
-		t.Error(err)
+	var data = st{
+		Name: "张三",
+		Age:  10,
+		Un:   20,
 	}
-	fmt.Println(cacheMsgKey)
+	var typeOf = reflect.TypeOf(data)
+	var valueOf = reflect.ValueOf(data)
+	var length = typeOf.NumField()
+	var filter = make([]interface{}, length*2)
+	for i := 0; i < length; i++ {
+		filter[i*2] = typeOf.Field(i).Name
+		value := valueOf.FieldByName(typeOf.Field(i).Name)
+		switch value.Interface().(type) {
+		case bool,
+			int,
+			int8,
+			int16,
+			int32,
+			int64,
+			uint,
+			uint8,
+			uint16,
+			uint32,
+			uint64,
+			float32,
+			float64,
+			complex64,
+			complex128,
+			[]byte,
+			string:
+			break
+		default:
+			panic(ErrUnknownType)
+		}
+		filter[i*2+1] = value.Interface()
+	}
+	err = cli.HMSet(ctx, "test", filter...).Err()
+	if err != nil {
+		panic(err)
+	}
+	var data2 st
+	err = cli.HGetAll(ctx, "test").Scan(&data2)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(data2)
 }

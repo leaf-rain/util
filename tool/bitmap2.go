@@ -8,7 +8,6 @@ import (
 
 var (
 	ErrOutOfMaps = errors.New("位图越界")
-	ErrLock      = errors.New("操作过于频繁")
 )
 
 type Maps struct {
