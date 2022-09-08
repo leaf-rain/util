@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 )
 
@@ -23,10 +24,48 @@ func replyGetTy() uint8 {
 	return replySpecificKeys[0]
 }
 
+func app(list []uint8) {
+	replySpecificKeys = append(list, 4, 5, 6)
+}
+
+type t1 interface {
+	ToString1()
+}
+
+// 声明一个空结构体
+type cat struct {
+	Name string
+	// 带有结构体tag的字段
+	Type int `json:"type" id:"100"`
+}
+
+type t2 interface {
+	ToString2()
+}
+
+func (c cat) ToString1() {
+	fmt.Println(c.Name)
+}
+func (c cat) ToString2() {
+	fmt.Println(c.Name)
+}
+
 func main() {
-	for i := int64(1); i <= 15; i++ {
-		fmt.Println(i)
+	var req = struct {
+		Name string
+		Age  int
+	}{Name: "张三", Age: 1000}
+	var typeOf = reflect.TypeOf(req)
+	var valueOf = reflect.ValueOf(req)
+	var length = typeOf.NumField()
+	var value = make([]interface{}, length*2)
+	var name string
+	for i := 0; i < length; i++ {
+		name = typeOf.Field(i).Name
+		value[i*2] = name
+		value[i*2+1] = valueOf.FieldByName(name)
 	}
+	fmt.Printf("%+v", value)
 }
 
 func charEncry(name []string, end int) string {

@@ -11,3 +11,7 @@ func GetMD5Encode(data string) string {
 	h.Write([]byte(data))
 	return hex.EncodeToString(h.Sum(nil))
 }
+
+func Get16MD5Encode(data string) string {
+	return GetMD5Encode(data)[8:24]
+}
