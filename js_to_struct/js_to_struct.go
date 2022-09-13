@@ -49,9 +49,10 @@ func (jts *JsonToStruct) AutoOutPath() {
 
 // 如果不指定结构体名称的话自动生成结构体名称
 func (jts *JsonToStruct) AutoStructName() {
-	jts.StructName = strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath))
+	jts.StructName = CamelString(strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath)))
 }
 
+// 输出到指定目录
 func (jts *JsonToStruct) ToStruct() error {
 	if jts.OutPath == "" || path.Ext(jts.OutPath) == "" {
 		jts.AutoOutPath()
@@ -70,6 +71,7 @@ func (jts *JsonToStruct) ToStruct() error {
 	stream := antlr.NewCommonTokenStream(lex, antlr.TokenDefaultChannel)
 	fileParser := parser.NewJSONParser(stream)
 	fileListener := listener.NewJsonToGoListener(&listener.GoTarget{
+		ConfPath: jts.ConfPath,
 		PkgName:  jts.PkgName,
 		ConfName: jts.StructName,
 	})

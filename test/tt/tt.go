@@ -1,13 +1,23 @@
 package main
 
-import "fmt"
+import "encoding/json"
 
 func mapIndex(x, y uint64) uint64 {
 	return y*1000 + x
 }
 
 func main() {
-	fmt.Printf("%v", 100)
+
+}
+
+type Test struct {
+}
+
+var data []byte
+
+func (model *Test) Unmarshal() (result *Test, err error) {
+	err = json.Unmarshal(data, &result)
+	return result, err
 }
 
 func CheckRepeatForList(l1, l2 []uint64) ([]uint64, float64) {
