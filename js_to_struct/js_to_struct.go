@@ -1,6 +1,7 @@
 package js_to_struct
 
 import (
+	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"github.com/leaf-rain/util/js_to_struct/listener"
 	"github.com/leaf-rain/util/js_to_struct/parser"
@@ -10,6 +11,38 @@ import (
 	"path"
 	"strings"
 )
+
+func JsonToStructForFolder(folderPath, outPath, pkgName string) error {
+	files, err := ioutil.ReadDir(folderPath)
+	if err != nil {
+		return err
+	}
+	if strings.HasPrefix(folderPath, "./") {
+		pwd, _ := os.Getwd()
+		folderPath = pwd + strings.TrimPrefix(folderPath, ".")
+	}
+	if strings.HasPrefix(outPath, "./") {
+		pwd, _ := os.Getwd()
+		outPath = pwd + strings.TrimPrefix(outPath, ".")
+	}
+	for _, item := range files {
+		fullname := folderPath + "/" + item.Name()
+		// 是文件夹则递归进入获取;是文件，则压入数组
+		if item.IsDir() {
+			err = JsonToStructForFolder(fullname, outPath, pkgName)
+			if err != nil {
+				return err
+			}
+		} else if path.Ext(fullname) == ".json" {
+			jts := NewJsonToStruct(fullname, outPath, pkgName, "")
+			err = jts.ToStruct()
+			if err != nil {
+				fmt.Println("err:", err)
+			}
+		}
+	}
+	return nil
+}
 
 type JsonToStruct struct {
 	ConfPath   string // 配置路径
@@ -34,6 +67,14 @@ func NewJsonToStruct(confPath, outPath, pkgName, StructName string) *JsonToStruc
 	if StructName == "" {
 		result.AutoStructName()
 	}
+	if strings.HasPrefix(result.ConfPath, "./") {
+		pwd, _ := os.Getwd()
+		result.ConfPath = pwd + strings.TrimPrefix(result.ConfPath, ".")
+	}
+	if strings.HasPrefix(result.OutPath, "./") {
+		pwd, _ := os.Getwd()
+		result.OutPath = pwd + strings.TrimPrefix(result.OutPath, ".")
+	}
 	return result
 }
 
@@ -44,7 +85,7 @@ func (jts *JsonToStruct) AutoOutPath() {
 	} else {
 		fileDir, _ = path.Split(jts.ConfPath)
 	}
-	jts.OutPath = fileDir + CamelString(strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath))) + ".go"
+	jts.OutPath = fileDir + strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath)) + ".go"
 }
 
 // 如果不指定结构体名称的话自动生成结构体名称
@@ -111,10 +152,21 @@ func CamelString(s string) string {
 func PutGoLang(name, content string) error {
 	f, err := os.Open(name)
 	if err != nil {
-		f, err = os.Create(name)
+		if os.IsNotExist(err) {
+			if _, err = os.Stat(path.Dir(name)); err != nil {
+				if os.IsNotExist(err) {
+					_ = os.MkdirAll(path.Dir(name), 0755)
+				}
+			}
+			f, err = os.Create(name)
+		}
+
 	}
 	defer f.Close()
-	f.WriteString(content)
+	_, err = f.WriteString(content)
+	if err != nil {
+		return err
+	}
 	cmd := exec.Command("gofmt", "-w", f.Name())
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
