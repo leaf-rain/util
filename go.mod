@@ -5,6 +5,8 @@ go 1.16
 require (
 	github.com/Andrew-M-C/go.emoji v1.0.1
 	github.com/OneOfOne/xxhash v1.2.8
+	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10
+	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20220911224424-aa1f1f12a846
 	github.com/apolloconfig/agollo/v4 v4.0.11
 	github.com/aws/aws-sdk-go v1.27.0
 	github.com/bitly/go-simplejson v0.5.0
@@ -38,13 +40,11 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
-	golang.org/x/exp v0.0.0-20210916165020-5cb4fee858ee
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7
-	google.golang.org/grpc v1.43.0
-	google.golang.org/protobuf v1.27.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.3.3

@@ -1,23 +1,13 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func mapIndex(x, y uint64) uint64 {
 	return y*1000 + x
 }
 
 func main() {
-	var x, y uint64 = 3, 3
-	var width, high uint64 = 3, 4
-	var area = make([][2]uint64, high)
-	var index = 0
-	for i := y; i < y+high; i++ {
-		area[index] = [2]uint64{mapIndex(x, i), mapIndex(x+width-1, i)}
-		index++
-	}
-	fmt.Println(area)
+	fmt.Printf("%v", 100)
 }
 
 func CheckRepeatForList(l1, l2 []uint64) ([]uint64, float64) {

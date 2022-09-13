@@ -12,9 +12,9 @@ import (
 type un int64
 
 type st struct {
-	Name string `redis:"Name"`
-	Age  int64  `redis:"Age"`
-	Un   un     `redis:"Un"`
+	Name string   `redis:"Name"`
+	Age  int64    `redis:"Age"`
+	Un   []uint64 `redis:"Un"`
 }
 
 var ErrUnknownType = errors.New("未知类型")
@@ -34,7 +34,7 @@ func TestNew(t *testing.T) {
 	var data = st{
 		Name: "张三",
 		Age:  10,
-		Un:   20,
+		Un:   []uint64{20},
 	}
 	var typeOf = reflect.TypeOf(data)
 	var valueOf = reflect.ValueOf(data)
