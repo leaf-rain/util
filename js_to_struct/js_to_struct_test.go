@@ -1,8 +1,12 @@
 package js_to_struct
 
 import (
+	"fmt"
+	js_to_struct "github.com/leaf-rain/util/js_to_struct/output"
 	"os"
+	"path"
 	"testing"
+	"time"
 )
 
 func TestNewJsonToStruct(t *testing.T) {
@@ -22,9 +26,15 @@ func TestJsonToStructForFolder(t *testing.T) {
 	} else {
 		t.Logf("success")
 	}
+	for {
+		time.Sleep(time.Second * 2)
+		fmt.Println(js_to_struct.CfgCheckpointBuffModel)
+	}
 }
 
 func TestTest(t *testing.T) {
 	var _, err = os.Stat("/Users/dartou")
 	t.Log(os.IsNotExist(err))
+	t.Log(path.Base("/Users/dartou/test.json"))
+
 }

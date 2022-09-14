@@ -17,16 +17,12 @@ func JsonToStructForFolder(folderPath, outPath, pkgName string) error {
 	if err != nil {
 		return err
 	}
-	if strings.HasPrefix(folderPath, "./") {
-		pwd, _ := os.Getwd()
-		folderPath = pwd + strings.TrimPrefix(folderPath, ".")
-	}
 	if strings.HasPrefix(outPath, "./") {
 		pwd, _ := os.Getwd()
 		outPath = pwd + strings.TrimPrefix(outPath, ".")
 	}
 	for _, item := range files {
-		fullname := folderPath + "/" + item.Name()
+		fullname := folderPath + item.Name()
 		// 是文件夹则递归进入获取;是文件，则压入数组
 		if item.IsDir() {
 			err = JsonToStructForFolder(fullname, outPath, pkgName)
@@ -66,14 +62,6 @@ func NewJsonToStruct(confPath, outPath, pkgName, StructName string) *JsonToStruc
 	}
 	if StructName == "" {
 		result.AutoStructName()
-	}
-	if strings.HasPrefix(result.ConfPath, "./") {
-		pwd, _ := os.Getwd()
-		result.ConfPath = pwd + strings.TrimPrefix(result.ConfPath, ".")
-	}
-	if strings.HasPrefix(result.OutPath, "./") {
-		pwd, _ := os.Getwd()
-		result.OutPath = pwd + strings.TrimPrefix(result.OutPath, ".")
 	}
 	return result
 }

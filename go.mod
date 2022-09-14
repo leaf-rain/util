@@ -5,7 +5,6 @@ go 1.16
 require (
 	github.com/Andrew-M-C/go.emoji v1.0.1
 	github.com/OneOfOne/xxhash v1.2.8
-	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20220911224424-aa1f1f12a846
 	github.com/apolloconfig/agollo/v4 v4.0.11
 	github.com/aws/aws-sdk-go v1.27.0
@@ -16,6 +15,7 @@ require (
 	github.com/davyxu/golog v0.1.0
 	github.com/davyxu/goobjfmt v0.1.0 // indirect
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
+	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/lestrrat/go-envload v0.0.0-20180220120943-6ed08b54a570 // indirect
@@ -26,6 +26,7 @@ require (
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/shima-park/agollo v1.2.12
 	github.com/sirupsen/logrus v1.8.1
+	github.com/spf13/viper v1.8.1
 	github.com/tebeka/strftime v0.1.5 // indirect
 	github.com/tsuna/gohbase v0.0.0-20210915142822-2d0b4a649730
 	github.com/vmihailenco/bufpool v0.1.11
