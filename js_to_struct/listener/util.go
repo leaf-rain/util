@@ -5,6 +5,31 @@ import (
 	"strings"
 )
 
+// FirstUpper 字符串首字母大写写
+func FirstUpper(s string) string {
+	if s == "" {
+		return ""
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+// FirstLower 字符串首字母小写
+func FirstLower(s string) string {
+	if s == "" {
+		return ""
+	}
+	return strings.ToLower(s[:1]) + s[1:]
+
+}
+
+func suffix(str string) string {
+	return str + "Model"
+}
+
+func suffixLock(str string) string {
+	return str + "Lock"
+}
+
 func stripQuotes(s string) string {
 	if s == "" || !strings.Contains(s, "\"") {
 		return s
