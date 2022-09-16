@@ -128,6 +128,16 @@ func (t *GoTarget) ExitArr(typeStr, valStr string) string {
 	if valStr == "" {
 		return "[] interface{}"
 	}
+	if valStr == "float64" {
+		if strings.Contains(strings.ToLower(valStr), "id") {
+			return "[]uint64"
+		}
+		if strings.Contains(valStr, ".") {
+			return "[]" + valStr
+		} else {
+			return "[]int64"
+		}
+	}
 	//println("##arr",valStr)
 	return "[]" + valStr
 }
