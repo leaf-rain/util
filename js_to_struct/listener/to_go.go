@@ -56,8 +56,8 @@ func Get%s() %s {
 
 func loadFunc(modelName, lockName, confName, confPath string) string {
 	return fmt.Sprintf(`
-func (model %s) loadConfig() { 
-	var fullPath = "%s"
+func (model %s) loadConfig(path string) { 
+	var fullPath =path.Join(path,path.Base(%s))
 	fileDataByte, err := ioutil.ReadFile(fullPath)
 	if err != nil {
 		panic(err)
@@ -107,7 +107,7 @@ func (t *GoTarget) ExitObj(typeStr, valStr string, isEnd bool, bIsMap bool) stri
 }
 func (t *GoTarget) PostExitObj(typeStr, valStr string) string {
 	//println("##obj",valStr)
-	return " \tlock     *sync.RWMutex \n}"
+	return "\n}"
 }
 
 // func (t*GoTarget)ExitPair is called when production pair is exited.

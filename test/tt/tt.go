@@ -1,13 +1,18 @@
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"path"
+)
 
 func mapIndex(x, y uint64) uint64 {
 	return y*1000 + x
 }
 
 func main() {
-
+	a := path.Join("../../test", path.Base("../../test.text"))
+	fmt.Println(a)
 }
 
 type Test struct {
