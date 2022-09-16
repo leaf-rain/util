@@ -2,6 +2,7 @@ package listener
 
 import (
 	"fmt"
+	"strings"
 )
 
 type GoTarget struct {
@@ -34,7 +35,14 @@ func varFunc(modelName, confName, lockName string) string {
 }
 
 func modelFunc(confName, valStr string) string {
-	return "\ntype " + confName + valStr + "\n"
+	valStr = strings.Trim(valStr, " ")
+	if strings.HasPrefix(valStr, "[]") {
+		var infoName = confName + "Info"
+		return "\ntype " + confName + " []" + infoName + "\n" +
+			"\ntype " + infoName + strings.TrimPrefix(valStr, "[]")
+	} else {
+		return "\ntype " + confName + valStr + "\n"
+	}
 }
 
 func getFunc(modelName, lockName, confName string) string {
@@ -128,6 +136,16 @@ func (t *GoTarget) ExitArr(typeStr, valStr string) string {
 func (t *GoTarget) ExitValue(typeStr, valStr string) string {
 	if typeStr == "null" {
 		return "interface{}"
+	}
+	if typeStr == "float64" {
+		if strings.Contains(strings.ToLower(valStr), "id") {
+			return "uint64"
+		}
+		if strings.Contains(valStr, ".") {
+			return typeStr
+		} else {
+			return "int64"
+		}
 	}
 	return typeStr
 }

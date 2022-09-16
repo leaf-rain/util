@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 	"testing"
-	"time"
 )
 
 func TestNewJsonToStruct(t *testing.T) {
@@ -23,9 +22,6 @@ func TestJsonToStructForFolder(t *testing.T) {
 		t.Errorf("failed, err:%v", err)
 	} else {
 		t.Logf("success")
-	}
-	for {
-		time.Sleep(time.Second * 2)
 	}
 }
 

@@ -138,7 +138,7 @@ func CamelString(s string) string {
 }
 
 func PutGoLang(name, content string) error {
-	f, err := os.Open(name)
+	f, err := os.OpenFile(name, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0766)
 	if err != nil {
 		if os.IsNotExist(err) {
 			if _, err = os.Stat(path.Dir(name)); err != nil {

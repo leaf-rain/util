@@ -1,6 +1,89 @@
-{
-  "id": 1,
-  "describe": "离开",
-  "buffType": 9,
-  "value": 0
-}
+[
+  {
+    "id": 1,
+    "name": "主殿1",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "lever": 1,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "主殿2",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "lever": 2,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "主殿3",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "lever": 3,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "兵营",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "校场",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "太学院",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "医疗站",
+    "maxLevel": 100,
+    "weight": 5,
+    "high": 5,
+    "upgradeTime": 360,
+    "upgradeMaterial": [
+      "1*1",
+      "2*1"
+    ]
+  }
+]
