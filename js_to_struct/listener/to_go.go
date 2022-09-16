@@ -129,16 +129,13 @@ func (t *GoTarget) ExitArr(typeStr, valStr string) string {
 		return "[] interface{}"
 	}
 	if valStr == "float64" {
-		if strings.Contains(strings.ToLower(valStr), "id") {
-			return "[]uint64"
-		}
 		if strings.Contains(valStr, ".") {
 			return "[]" + valStr
 		} else {
 			return "[]int64"
 		}
 	}
-	//println("##arr",valStr)
+	//println("##arr", valStr)
 	return "[]" + valStr
 }
 
@@ -148,9 +145,6 @@ func (t *GoTarget) ExitValue(typeStr, valStr string) string {
 		return "interface{}"
 	}
 	if typeStr == "float64" {
-		if strings.Contains(strings.ToLower(valStr), "id") {
-			return "uint64"
-		}
 		if strings.Contains(valStr, ".") {
 			return typeStr
 		} else {
