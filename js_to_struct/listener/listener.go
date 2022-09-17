@@ -113,17 +113,42 @@ func (l *Listener) EnterArr(ctx *parser.ArrContext) {}
 // ExitArr is called when production arr is exited.
 func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 	ValueType := ""
+	var vt, vv = l.gocodeMap[ctx.Value(0)].Type, l.gocodeMap[ctx.Value(0)].Value
 	if l.gocodeMap[ctx.Value(0)].Type == "array" {
 		ValueType = "list<" + l.gocodeMap[ctx.Value(0)].ValueType + ">"
+	} else if l.gocodeMap[ctx.Value(0)].Type == "struct" {
+		ValueType = l.gocodeMap[ctx.Value(0)].Type
+		var stringMap = make(map[string]string)
+		var str string
+		for i := 0; i < ctx.GetChildCount(); i++ {
+			str = l.gocodeMap[ctx.Value(i)].Value
+			str = strings.Trim(str, " ")
+			if ctx.Value(i) == nil || !strings.HasPrefix(strings.TrimPrefix(str, " "), "struct") {
+				continue
+			}
+			var slice = strings.Split(str, "\n")
+			for _, item := range slice {
+				var key = strings.Trim(strings.Split(item, " ")[0], " ")
+				if key == "struct" || key == "}" {
+					continue
+				}
+				stringMap[key] = item
+			}
+		}
+		var fields string
+		for _, value := range stringMap {
+			fields += "\n\t" + value
+		}
+		vv = " struct {" + fields + "\n}"
 	} else {
 		ValueType = l.gocodeMap[ctx.Value(0)].Type
 	}
 	l.gocodeMap[ctx] = Node{
 		Type:      "array",
-		Value:     l.Target.ExitArr(l.gocodeMap[ctx.Value(0)].Type, l.gocodeMap[ctx.Value(0)].Value),
+		Value:     l.Target.ExitArr(vt, vv),
 		ValueType: ValueType,
 	}
-	//fmt.Println(ctx.GetChild(0),ctx.Value(0))
+	//fmt.Println(ctx.GetChild(0), ctx.Value(0))
 }
 
 // EnterValue is called when production value is entered.
