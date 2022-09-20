@@ -134,8 +134,10 @@ func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 				if key == "struct" || key == "}" {
 					continue
 				}
-				stringMap[key] = struct{}{}
-				stringSlice = append(stringSlice, item)
+				if _, ok := stringMap[key]; !ok {
+					stringMap[key] = struct{}{}
+					stringSlice = append(stringSlice, item)
+				}
 			}
 		}
 		var fields string
