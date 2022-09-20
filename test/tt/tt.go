@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"path"
 )
 
 func mapIndex(x, y uint64) uint64 {
@@ -11,8 +10,7 @@ func mapIndex(x, y uint64) uint64 {
 }
 
 func main() {
-	a := path.Join("../../test", path.Base("../../test.text"))
-	fmt.Println(a)
+	fmt.Println()
 }
 
 type Test struct {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"github.com/leaf-rain/util/js_to_struct/parser"
+	"sort"
 	"strings"
 )
 
@@ -118,7 +119,8 @@ func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 		ValueType = "list<" + l.gocodeMap[ctx.Value(0)].ValueType + ">"
 	} else if l.gocodeMap[ctx.Value(0)].Type == "struct" {
 		ValueType = l.gocodeMap[ctx.Value(0)].Type
-		var stringMap = make(map[string]string)
+		var stringMap = make(map[string]struct{})
+		var stringSlice = make([]string, 0)
 		var str string
 		for i := 0; i < ctx.GetChildCount(); i++ {
 			str = l.gocodeMap[ctx.Value(i)].Value
@@ -132,11 +134,13 @@ func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 				if key == "struct" || key == "}" {
 					continue
 				}
-				stringMap[key] = item
+				stringMap[key] = struct{}{}
+				stringSlice = append(stringSlice, item)
 			}
 		}
 		var fields string
-		for _, value := range stringMap {
+		sort.Sort(sort.StringSlice(stringSlice))
+		for _, value := range stringSlice {
 			fields += "\n\t" + value
 		}
 		vv = " struct {" + fields + "\n}"
