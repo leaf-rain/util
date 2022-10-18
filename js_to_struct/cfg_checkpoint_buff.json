@@ -1,119 +1,16 @@
-[
-  {
-    "scientificId": 1,
-    "skillsId": 1,
-    "maxLv": 1,
-    "preconditionSkills": [
-      0
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
+[{
+  "id": 1000001,
+  "name": "测试技能2",
+  "attachRole": 1000001,
+  "effects": [{
+    "type": "attack",
+    "desc": "伤害增加%d%",
+    "values": [1, 2, 3, 4, 5, 6]
   },
-  {
-    "scientificId": 1,
-    "skillsId": 2,
-    "maxLv": 1,
-    "preconditionSkills": [
-      1
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  },
-  {
-    "scientificId": 1,
-    "skillsId": 3,
-    "maxLv": 1,
-    "preconditionSkills": [
-      1
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  },
-  {
-    "scientificId": 1,
-    "skillsId": 4,
-    "maxLv": 1,
-    "preconditionSkills": [
-      1
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  },
-  {
-    "scientificId": 1,
-    "skillsId": 5,
-    "maxLv": 1,
-    "preconditionSkills": [
-      2,
-      3,
-      4
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  },
-  {
-    "scientificId": 1,
-    "skillsId": 6,
-    "maxLv": 1,
-    "preconditionSkills": [
-      2,
-      3,
-      4
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  },
-  {
-    "scientificId": 1,
-    "skillsId": 7,
-    "maxLv": 1,
-    "preconditionSkills": [
-      5,
-      6
-    ],
-    "preconditionMaterial": [
-      "5*1",
-      "6*1",
-      "7*1"
-    ],
-    "preconditionBuild": [
-      6
-    ]
-  }
-]
+    {
+      "type": "attack",
+      "desc": "伤害增加%d%",
+      "values": [1, 2, 3, 4, 5, 6]
+    }
+  ]
+}]

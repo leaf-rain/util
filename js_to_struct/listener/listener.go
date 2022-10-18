@@ -129,9 +129,30 @@ func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 				continue
 			}
 			var slice = strings.Split(str, "\n")
+			var needDelNum int
+			var sign bool
+			var obj string
 			for _, item := range slice {
 				var key = strings.Trim(strings.Split(item, " ")[0], " ")
-				if key == "struct" || key == "}" {
+				if key == "struct" {
+					needDelNum++
+					continue
+				}
+				if strings.HasSuffix(item, "{") {
+					sign = true
+					obj += "\n\t" + item
+					continue
+				}
+				switch {
+				case sign && key == "}":
+					obj += "\n\t" + item
+					item, obj = obj, ""
+					sign = false
+				case key == "}" && needDelNum > 0:
+					needDelNum--
+					continue
+				case sign:
+					obj += "\n\t" + item
 					continue
 				}
 				if _, ok := stringMap[key]; !ok {

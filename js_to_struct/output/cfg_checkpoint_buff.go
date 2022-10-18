@@ -8,35 +8,38 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"strings"
 	"sync"
 )
 
-func init() {
-	cfgCheckpointBuffModel.loadConfig()
-}
-
 var cfgCheckpointBuffModel = new(CfgCheckpointBuff)
 var cfgCheckpointBuffLock = new(sync.RWMutex)
+var cfgCheckpointBuffOnce = new(sync.Once)
 
 type CfgCheckpointBuff []CfgCheckpointBuffInfo
 
 type CfgCheckpointBuffInfo struct {
-	ScientificId         int64    `json:"scientificId"`
-	SkillsId             int64    `json:"skillsId"`
-	MaxLv                int64    `json:"maxLv"`
-	PreconditionSkills   []int64  `json:"preconditionSkills"`
-	PreconditionMaterial []string `json:"preconditionMaterial"`
-	PreconditionBuild    []int64  `json:"preconditionBuild"`
+	Effects []struct {
+		Desc   string  `json:"desc"`
+		Type   string  `json:"type"`
+		Values []int64 `json:"values"`
+	} `json:"effects"`
+	AttachRole int64  `json:"attachRole"`
+	Id         int64  `json:"id"`
+	Name       string `json:"name"`
 }
 
-func GetCfgCheckpointBuff() CfgCheckpointBuff {
+func GetCfgCheckpointBuff(jsPath string) CfgCheckpointBuff {
+	cfgCheckpointBuffOnce.Do(func() {
+		cfgCheckpointBuffModel.loadConfig(jsPath)
+	})
 	cfgCheckpointBuffLock.Lock()
 	defer cfgCheckpointBuffLock.Unlock()
 	return *cfgCheckpointBuffModel
 }
-func (model CfgCheckpointBuff) loadConfig() {
-	var fullPath = "./cfg_checkpoint_buff.json"
+func (model CfgCheckpointBuff) loadConfig(jsPath string) {
+	var fullPath = path.Join(jsPath, path.Base("./cfg_checkpoint_buff.json"))
 	fileDataByte, err := ioutil.ReadFile(fullPath)
 	if err != nil {
 		panic(err)
@@ -59,6 +62,7 @@ func (model CfgCheckpointBuff) loadConfig() {
 		}
 		cfgCheckpointBuffLock.Lock()
 		defer cfgCheckpointBuffLock.Unlock()
+		cfgCheckpointBuffModel = new(CfgCheckpointBuff)
 		err = json.Unmarshal(fileDataByte, &cfgCheckpointBuffModel)
 		if err != nil {
 			log.Printf("errors!, config json.Unmarshal %s update faild", e.Name)

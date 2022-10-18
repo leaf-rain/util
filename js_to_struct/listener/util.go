@@ -30,6 +30,10 @@ func suffixLock(str string) string {
 	return str + "Lock"
 }
 
+func suffixOnce(str string) string {
+	return str + "Once"
+}
+
 func stripQuotes(s string) string {
 	if s == "" || !strings.Contains(s, "\"") {
 		return s
