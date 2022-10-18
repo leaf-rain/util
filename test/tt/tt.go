@@ -1,26 +1,66 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"google.golang.org/protobuf/proto"
 )
 
 func mapIndex(x, y uint64) uint64 {
 	return y*1000 + x
 }
 
+const (
+	MethodMsgIDSize = 16 // 16位字符
+)
+
+//go generate ./person.go
 func main() {
-	fmt.Println()
+	var a = 65537
+	fmt.Println(uint16(a))
 }
 
-type Test struct {
+func StringAppendUnRepeat(data []string, item string) {
+	var needAppend = true
+	for i := range data {
+		if data[i] == item {
+			needAppend = false
+		}
+	}
+	if needAppend {
+		data = append(data, item)
+	}
 }
 
-var data []byte
+func ByteToArgumentBody(req []byte) *ArgumentBody {
+	if len(req) < MethodMsgIDSize {
+		return nil
+	}
+	var requestBody = &ArgumentBody{}
+	requestBody.Id = string(req[:MethodMsgIDSize])
+	requestBody.Body = req[MethodMsgIDSize:]
+	return requestBody
+}
 
-func (model *Test) Unmarshal() (result *Test, err error) {
-	err = json.Unmarshal(data, &result)
-	return result, err
+func ArgumentBodyToByte(req *ArgumentBody) []byte {
+	if len(req.Id) == 0 {
+		return nil
+	}
+	var body []byte
+	if req.Any != nil {
+		if msg, ok := req.Any.(proto.Message); !ok {
+			return nil
+		} else {
+			body, _ = proto.Marshal(msg)
+		}
+	} else {
+		body = req.Body
+	}
+	var result = make([]byte, MethodMsgIDSize+len(body))
+	for index, item := range req.Id {
+		result[index] = byte(item)
+	}
+	copy(result[MethodMsgIDSize:], body)
+	return result
 }
 
 func CheckRepeatForList(l1, l2 []uint64) ([]uint64, float64) {

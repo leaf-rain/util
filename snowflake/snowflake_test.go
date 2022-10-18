@@ -3,6 +3,7 @@ package snowflake
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func TestGetId(t *testing.T) {
@@ -11,8 +12,10 @@ func TestGetId(t *testing.T) {
 		idMax   int64 = 0
 		idError int64 = 0
 	)
-	for i := 0; i < 1000000; i++ {
+	for i := 0; i < 100; i++ {
 		id := GetSnowflakeId().Int64()
+		fmt.Println(id)
+		fmt.Println(float64(id))
 		if id > idMax {
 			idMax = id
 		} else {
@@ -22,4 +25,5 @@ func TestGetId(t *testing.T) {
 	}
 	fmt.Println(len(idMap))
 	fmt.Println(idError)
+	fmt.Println(time.Now().UnixMilli())
 }

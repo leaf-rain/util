@@ -11,10 +11,10 @@ var client *gorm.DB
 
 func TestMain(m *testing.M) {
 	client = NewMysql(&Config{
-		Addr:       "192.168.1.111:3306",
+		Addr:       "127.0.0.1:3306",
 		User:       "root",
-		Password:   "master",
-		DbName:     "vchat_main",
+		Password:   "password",
+		DbName:     "gateway",
 		Parameters: "charset=utf8mb4&parseTime=true&loc=Local",
 	})
 	now := time.Now()
@@ -29,20 +29,16 @@ type Like struct {
 }
 
 func TestMysql(t *testing.T) {
-
-	rows, err := client.Table("like0").Select("id", "like_uid").Where("uid = 20").Rows()
+	var sql = "select * from gateway.method"
+	rows, err := client.Raw(sql).Rows()
 	fmt.Println("init err ===> ", err)
 	defer rows.Close()
 
 	for rows.Next() {
-		var likeModelS = Like{}
-		if err := rows.Scan(&likeModelS.Id, &likeModelS.LikeUid); err != nil {
-			fmt.Println("err ===>", err)
-		}
-		fmt.Println(likeModelS)
+		fmt.Println(rows)
 	}
 	if rows.Next() {
-
+		fmt.Println(rows)
 	} else {
 		fmt.Println("====")
 	}

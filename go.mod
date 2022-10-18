@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Andrew-M-C/go.emoji v1.0.1
 	github.com/OneOfOne/xxhash v1.2.8
+	github.com/StephaneBunel/bresenham v0.0.0-20211027152503-ec76d7b8e923
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20220911224424-aa1f1f12a846
 	github.com/apolloconfig/agollo/v4 v4.0.11
 	github.com/aws/aws-sdk-go v1.27.0
@@ -46,6 +47,7 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	golang.org/x/text v0.3.7
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.3.3
