@@ -25,7 +25,7 @@ type CfgCheckpointBuffInfo struct {
 		Type   string  `json:"type"`
 		Values []int64 `json:"values"`
 	} `json:"effects"`
-	AttachRole int64  `json:"attachRole"`
+	AttachRole int64  `json:"attach_role"`
 	Id         int64  `json:"id"`
 	Name       string `json:"name"`
 }

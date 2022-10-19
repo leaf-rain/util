@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"github.com/leaf-rain/util/js_to_struct/parser"
+	"github.com/leaf-rain/util/js_to_struct/util"
 	"sort"
 	"strings"
 )
@@ -133,11 +134,14 @@ func (l *Listener) ExitArr(ctx *parser.ArrContext) {
 			var sign bool
 			var obj string
 			for _, item := range slice {
-				var key = strings.Trim(strings.Split(item, " ")[0], " ")
+				var itemInfo = strings.SplitN(item, " ", 2)
+				var key = strings.Trim(itemInfo[0], " ")
 				if key == "struct" {
 					needDelNum++
 					continue
 				}
+				itemInfo[0] = util.CamelString(key)
+				item = strings.Join(itemInfo, " ")
 				if strings.HasSuffix(item, "{") {
 					sign = true
 					obj += "\n\t" + item

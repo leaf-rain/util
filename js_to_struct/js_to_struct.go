@@ -5,9 +5,9 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr/v4"
 	"github.com/leaf-rain/util/js_to_struct/listener"
 	"github.com/leaf-rain/util/js_to_struct/parser"
+	"github.com/leaf-rain/util/js_to_struct/util"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 )
@@ -78,7 +78,7 @@ func (jts *JsonToStruct) AutoOutPath() {
 
 // 如果不指定结构体名称的话自动生成结构体名称
 func (jts *JsonToStruct) AutoStructName() {
-	jts.StructName = CamelString(strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath)))
+	jts.StructName = util.CamelString(strings.TrimSuffix(path.Base(jts.ConfPath), path.Ext(jts.ConfPath)))
 }
 
 // 输出到指定目录
@@ -105,61 +105,8 @@ func (jts *JsonToStruct) ToStruct() error {
 		ConfName: jts.StructName,
 	})
 	antlr.ParseTreeWalkerDefault.Walk(fileListener, fileParser.Json())
-	err = PutGoLang(jts.OutPath, fileListener.JsonStr)
+	err = util.PutGoLang(jts.OutPath, fileListener.JsonStr)
 	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// 蛇形转驼峰
-func CamelString(s string) string {
-	data := make([]byte, 0, len(s))
-	j := false
-	k := false
-	num := len(s) - 1
-	for i := 0; i <= num; i++ {
-		d := s[i]
-		if k == false && d >= 'A' && d <= 'Z' {
-			k = true
-		}
-		if d >= 'a' && d <= 'z' && (j || k == false) {
-			d = d - 32
-			j = false
-			k = true
-		}
-		if k && d == '_' && num > i && s[i+1] >= 'a' && s[i+1] <= 'z' {
-			j = true
-			continue
-		}
-		data = append(data, d)
-	}
-	return string(data[:])
-}
-
-func PutGoLang(name, content string) error {
-	f, err := os.OpenFile(name, os.O_RDWR|os.O_TRUNC|os.O_CREATE, 0766)
-	if err != nil {
-		if os.IsNotExist(err) {
-			if _, err = os.Stat(path.Dir(name)); err != nil {
-				if os.IsNotExist(err) {
-					_ = os.MkdirAll(path.Dir(name), 0755)
-				}
-			}
-			f, err = os.Create(name)
-		}
-
-	}
-	defer f.Close()
-	_, err = f.WriteString(content)
-	if err != nil {
-		return err
-	}
-	cmd := exec.Command("gofmt", "-w", f.Name())
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-
-	if err = cmd.Run(); err != nil {
 		return err
 	}
 	return nil

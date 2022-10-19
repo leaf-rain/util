@@ -1,7 +1,7 @@
 [{
   "id": 1000001,
   "name": "测试技能2",
-  "attachRole": 1000001,
+  "attach_role": 1000001,
   "effects": [{
     "type": "attack",
     "desc": "伤害增加%d%",
