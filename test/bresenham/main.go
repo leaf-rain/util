@@ -1,19 +1,27 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"time"
+	"github.com/spf13/viper"
+	_ "github.com/spf13/viper/remote"
+	"net/http"
 )
 
 func main() {
-	var ctx = context.WithValue(context.Background(), 1, 1)
-	go func(ctx context.Context) {
-		for {
-			fmt.Println(ctx.Value(1))
-			time.Sleep(time.Second)
-		}
-	}(ctx)
-	time.Sleep(time.Second * 3)
+	endpoint := "http://127.0.0.1:2379"
+	path := "k1"
 
+	viper.RemoteConfig = &Config{}
+
+	v := viper.New()
+	v.AddRemoteProvider("etcd", endpoint, path)
+	v.SetConfigType("json")
+	v.ReadRemoteConfig()
+	v.WatchRemoteConfigOnChannel()
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, v.GetString("service.password"))
+	})
+
+	http.ListenAndServe(":8080", nil)
 }

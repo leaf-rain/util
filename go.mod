@@ -2,16 +2,18 @@ module github.com/leaf-rain/util
 
 go 1.16
 
+replace google.golang.org/grpc => google.golang.org/grpc v1.29.1
+
 require (
 	github.com/Andrew-M-C/go.emoji v1.0.1
 	github.com/OneOfOne/xxhash v1.2.8
-	github.com/StephaneBunel/bresenham v0.0.0-20211027152503-ec76d7b8e923
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20220911224424-aa1f1f12a846
 	github.com/apolloconfig/agollo/v4 v4.0.11
 	github.com/aws/aws-sdk-go v1.27.0
 	github.com/bitly/go-simplejson v0.5.0
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bwmarrin/snowflake v0.3.0
+	github.com/coreos/etcd v3.3.27+incompatible // indirect
 	github.com/davyxu/cellnet v4.1.0+incompatible
 	github.com/davyxu/golog v0.1.0
 	github.com/davyxu/goobjfmt v0.1.0 // indirect
@@ -34,6 +36,7 @@ require (
 	github.com/vmihailenco/go-tinylfu v0.2.2
 	github.com/zeromicro/go-queue v1.1.2
 	github.com/zeromicro/go-zero v1.3.0
+	go.etcd.io/etcd v3.3.27+incompatible
 	go.etcd.io/etcd/api/v3 v3.5.1
 	go.etcd.io/etcd/client/v3 v3.5.1
 	go.mongodb.org/mongo-driver v1.8.3

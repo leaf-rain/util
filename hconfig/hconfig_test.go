@@ -17,8 +17,8 @@ func TestNewHConfig_ETCD(t *testing.T) {
 		return
 	}
 	c, err := etcd.NewEtcdConfig(cli,
-		etcd.WithRoot("/hconf"),
-		etcd.WithPaths("app", "mysql"))
+		etcd.WithRoot("/key"),
+		etcd.WithPaths("k1", "k2.json"))
 	if err != nil {
 		t.Error(err)
 		return
@@ -34,7 +34,7 @@ func TestNewHConfig_ETCD(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	val, err := conf.Get("app")
+	val, err := conf.Get("k1")
 	if err != nil {
 		t.Error(err)
 		return

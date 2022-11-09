@@ -6,10 +6,6 @@ import (
 
 type Option func(*options)
 
-// /honf/test
-// /honf/test2
-// /honf/test3
-// /honf/test3/conf/2
 type options struct {
 	ctx   context.Context
 	root  string
@@ -37,7 +33,7 @@ func WithPaths(path ...string) Option {
 func NewOptions(opts ...Option) *options {
 	options := &options{
 		ctx:   context.Background(),
-		root:  "/hconf",
+		root:  "/config",
 		paths: []string{"test"},
 	}
 	for _, opt := range opts {

@@ -55,3 +55,35 @@ func RemoveRep(slc []int) []int {
 		return RemoveRepByMap(slc)
 	}
 }
+
+//通过map键的唯一性去重
+func RemoveRepeatedForString(s []string) []string {
+	result := make([]string, 0)
+	m := make(map[string]bool) //map的值不重要
+	for _, v := range s {
+		if _, ok := m[v]; !ok {
+			result = append(result, v)
+			m[v] = true
+		}
+	}
+	return result
+}
+
+// 返回第一列表不包含第二个列表内容
+func RemoveStringRepeatedByString(slice, repeatedSlice []string) []string {
+	slice = RemoveRepeatedForString(slice)
+	result := make([]string, 0)
+	var isAdd bool
+	for _, item1 := range slice {
+		isAdd = true
+		for _, item2 := range repeatedSlice {
+			if item1 == item2 {
+				isAdd = false
+			}
+		}
+		if isAdd {
+			result = append(result, item1)
+		}
+	}
+	return result
+}

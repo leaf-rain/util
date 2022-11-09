@@ -1,8 +1,13 @@
 package main
 
 import (
+	"encoding/binary"
 	"fmt"
 	"google.golang.org/protobuf/proto"
+	"math/rand"
+	"strings"
+	"time"
+	"unicode"
 )
 
 func mapIndex(x, y uint64) uint64 {
@@ -15,7 +20,85 @@ const (
 
 //go generate ./person.go
 func main() {
-	fmt.Println(CamelString("Oar_fasd"))
+	fmt.Println(binary.LittleEndian.Uint16([]byte{21}))
+}
+
+func Camel2Case2(name string) string {
+	var result = ""
+	var last = -1
+	var length = len(name)
+	for i, r := range name {
+		value := string(r)
+		if unicode.IsUpper(r) {
+			if i > 0 && unicode.IsUpper(rune(name[i-1])) && i+1 < length && !unicode.IsUpper(rune(name[i+1])) {
+				result += "_" + strings.ToLower(value)
+			} else {
+				if last+1 == i {
+					result += strings.ToLower(value)
+				} else {
+					result += "_" + strings.ToLower(value)
+				}
+			}
+			last = i
+		} else {
+			result += value
+		}
+	}
+	return result
+}
+
+func Camel2Case(name string) string {
+	var index = -1
+	var slice = make([]string, 0)
+	var isUpper = make([]int, 0)
+	for i, r := range name {
+		value := string(r)
+		if unicode.IsUpper(r) {
+			if i > 0 && unicode.IsUpper(rune(name[i-1])) {
+				if index < 0 {
+					index = 0
+				}
+				slice[index] = slice[index] + value
+			} else {
+				index++
+				isUpper = append(isUpper, index)
+				slice = append(slice, value)
+			}
+		} else {
+			index++
+			slice = append(slice, value)
+		}
+	}
+	fmt.Println(slice)
+	fmt.Println(isUpper)
+	return strings.Join(slice, "")
+}
+
+func search(nums []int, target int) int {
+	var l = 0
+	var r = len(nums) - 1
+	var i int
+	for l <= r {
+		i = l + (r-l)/2
+		if nums[i] == target {
+			return i
+		} else if nums[i] < target {
+			l = i + 1
+		} else if nums[i] > target {
+			r = i - 1
+		}
+	}
+	return -1
+}
+
+func GenerateRandInt(min, max uint32) uint32 {
+	if max < min {
+		return 0
+	}
+	rand.Seed(time.Now().UnixNano()) //随机种子
+	result := rand.Intn(int(max-min)) + int(min)
+	return uint32(result)
+
 }
 
 // 蛇形转驼峰
