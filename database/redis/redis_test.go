@@ -12,12 +12,42 @@ import (
 type un int64
 
 type st struct {
-	Name string   `redis:"Name"`
-	Age  int64    `redis:"Age"`
-	Un   []uint64 `redis:"Un"`
+	Name string `redis:"Name"`
+	Age  int64  `redis:"Age"`
 }
 
 var ErrUnknownType = errors.New("未知类型")
+var ctx = context.Background()
+var cli *Client
+
+func TestMain(m *testing.M) {
+	var err error
+	cli, err = NewRedis(Config{
+		PoolSize: 5,
+		Addr: []string{
+			"127.0.0.1:6379",
+		},
+		DialTimeout: time.Second * 10,
+	}, ctx)
+	if err != nil {
+		panic(err)
+	}
+	if cli.Ping(ctx).Err() != nil {
+		panic("ping failed")
+	}
+	now := time.Now()
+	m.Run()
+	fmt.Println("程序执行耗时:", time.Since(now))
+}
+
+func TestIncr(t *testing.T) {
+	result, err := cli.IncrUnMinus(ctx, "testKey", 1)
+	if err != nil {
+		t.Errorf("failed, err:%v", err)
+	} else {
+		t.Logf("success, result:%+v", result)
+	}
+}
 
 func TestNew(t *testing.T) {
 	var ctx = context.Background()
@@ -34,7 +64,6 @@ func TestNew(t *testing.T) {
 	var data = st{
 		Name: "张三",
 		Age:  10,
-		Un:   []uint64{20},
 	}
 	var typeOf = reflect.TypeOf(data)
 	var valueOf = reflect.ValueOf(data)
@@ -71,10 +100,11 @@ func TestNew(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	var data2 st
-	err = cli.HGetAll(ctx, "test").Scan(&data2)
+	var ret map[string]string
+	ret, err = cli.HGetAll(ctx, "test").Result()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(data2)
+
+	fmt.Println(ret)
 }

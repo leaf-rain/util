@@ -6,9 +6,8 @@ import (
 	"strings"
 )
 
-func emojiHandle(str string) string {
+func emojiHandle(str string, preNum, sufNum int) string {
 	i := 0
-
 	var emojiMap = make(map[string]string, 0)
 	var keySlice = make([]string, 0)
 	final := emoji.ReplaceAllEmojiFunc(str, func(emoji string) string {
@@ -45,27 +44,26 @@ func emojiHandle(str string) string {
 	} else {
 		result = strings.Split(str, "")
 	}
-	var end = 2
 	for index := range result {
 		if _, ok := emojiMap[result[index]]; ok {
 			result[index] = emojiMap[result[index]]
 		}
 	}
-	return charEncry(result, end)
+	return charEncry(result, preNum, sufNum)
 }
 
-func charEncry(name []string, end int) string {
+func charEncry(name []string, preNum, sufNum int) string {
 	var length = len(name)
 	var encry = "***"
-	if length < 5 {
+	if length < preNum+sufNum {
 		var right int
-		if length >= 3 {
-			right = 3
+		if length >= preNum {
+			right = preNum
 		} else {
 			right = length
 		}
 		return strings.Join(name[:right], "") + encry
 	} else {
-		return strings.Join(name[:3], "") + encry + strings.Join(name[length-end:], "")
+		return strings.Join(name[:preNum], "") + encry + strings.Join(name[length-sufNum:], "")
 	}
 }

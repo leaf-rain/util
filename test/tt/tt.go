@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/binary"
 	"fmt"
 	"google.golang.org/protobuf/proto"
 	"math/rand"
@@ -20,7 +19,7 @@ const (
 
 //go generate ./person.go
 func main() {
-	fmt.Println(binary.LittleEndian.Uint16([]byte{21}))
+	fmt.Println(fmt.Sprintf("%08d", time.Now().Unix()))
 }
 
 func Camel2Case2(name string) string {
