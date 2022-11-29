@@ -19,7 +19,7 @@ const (
 
 //go generate ./person.go
 func main() {
-	fmt.Println(fmt.Sprintf("%08d", time.Now().Unix()))
+	fmt.Println(100 / 256)
 }
 
 func Camel2Case2(name string) string {

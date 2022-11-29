@@ -1,3 +1,4 @@
+# https://github.com/sliveryou/grom/blob/master/README_zh-CN.md
 out_dir: "."  # out dir
 url_tag: json # web url tag(json,db(https://github.com/google/go-querystring))
 language:  # language(English,中 文)
@@ -16,11 +17,11 @@ table_names: "relation_blocklist" # Specified table generation, multiple tables 
 is_column_name: true # Whether to generate column names
 is_out_file_by_table_name: false # Whether to generate multiple models based on table names
 db_info:
-  host: "localhost"
-  port: 3306
+  host: "114.55.31.212"
+  port: 1026
   username: "root"
   password: "password"
-  database: "test_chat"
+  database: "landlord"
   type: 0 # database type (0:mysql , 1:sqlite , 2:mssql)
 self_type_define: # Custom data type mapping
   datetime: time.Time

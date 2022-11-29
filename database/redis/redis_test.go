@@ -12,8 +12,9 @@ import (
 type un int64
 
 type st struct {
-	Name string `redis:"Name"`
-	Age  int64  `redis:"Age"`
+	Name  string  `redis:"Name"`
+	Age   int64   `redis:"Age"`
+	Slice []int64 `redis:"Slice"`
 }
 
 var ErrUnknownType = errors.New("未知类型")
@@ -41,7 +42,16 @@ func TestMain(m *testing.M) {
 }
 
 func TestIncr(t *testing.T) {
-	result, err := cli.IncrUnMinus(ctx, "testKey", 1)
+	result, err := cli.IncrUnMinus(ctx, "testKey", -1)
+	if err != nil {
+		t.Errorf("failed, err:%v", err)
+	} else {
+		t.Logf("success, result:%+v", result)
+	}
+}
+
+func TestHIncr(t *testing.T) {
+	result, err := cli.HIncrUnMinus(ctx, "tk", "t", -1)
 	if err != nil {
 		t.Errorf("failed, err:%v", err)
 	} else {
@@ -62,8 +72,9 @@ func TestNew(t *testing.T) {
 		panic(err)
 	}
 	var data = st{
-		Name: "张三",
-		Age:  10,
+		Name:  "张三",
+		Age:   10,
+		Slice: []int64{1, 2, 3},
 	}
 	var typeOf = reflect.TypeOf(data)
 	var valueOf = reflect.ValueOf(data)

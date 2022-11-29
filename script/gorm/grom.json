@@ -1,0 +1,21 @@
+{
+    "host": "114.55.31.212",
+    "port": 1026,
+    "user": "root",
+    "password": "password",
+    "database": "landlord",
+    "table": "sv_user_info_1",
+    "package_name": "entity",
+    "struct_name": "SvUserInfo",
+    "enable_initialism": true,
+    "enable_field_comment": true,
+    "enable_sql_null": false,
+    "enable_guregu_null": false,
+    "enable_json_tag": true,
+    "enable_xml_tag": false,
+    "enable_gorm_tag": false,
+    "enable_xorm_tag": false,
+    "enable_beego_tag": false,
+    "enable_gorose_tag": false,
+    "enable_gorm_v2_tag": true
+}
