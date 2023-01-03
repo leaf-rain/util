@@ -31,10 +31,29 @@ var HIncrScript = redis2.NewScript(`if (redis.call('exists', KEYS[1]) == 1) then
 			end;
 			return -3;`)
 
+var HIncrMinZeroScript = redis2.NewScript(`if (redis.call('exists', KEYS[1]) == 1) then
+				local stock = tonumber(redis.call('hget', KEYS[1], KEYS[2]));
+				local num = tonumber(ARGV[1]);
+				if (stock == -1) then
+					return -1;
+				end;
+				if (stock + num >= 0) then
+					return redis.call('HINCRBY', KEYS[1], KEYS[2], num);
+				elseif (stock + num < 0) then
+					return redis.call('HSET', KEYS[1], KEYS[2], 0)
+				end;
+				return -2;
+			end;
+			return -3;`)
+
 func (c *Client) IncrUnMinus(ctx context.Context, key string, num int64) (int64, error) {
 	return IncrScript.Run(ctx, c, []string{key}, num).Int64()
 }
 
 func (c *Client) HIncrUnMinus(ctx context.Context, key, subKey string, num int64) (int64, error) {
 	return HIncrScript.Run(ctx, c, []string{key, subKey}, num).Int64()
+}
+
+func (c *Client) HIncrMinZero(ctx context.Context, key, subKey string, num int64) (int64, error) {
+	return HIncrMinZeroScript.Run(ctx, c, []string{key, subKey}, num).Int64()
 }

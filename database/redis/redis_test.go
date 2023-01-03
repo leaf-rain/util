@@ -59,6 +59,15 @@ func TestHIncr(t *testing.T) {
 	}
 }
 
+func TestHIncrMinZero(t *testing.T) {
+	result, err := cli.HIncrMinZero(ctx, "tk", "t", -100)
+	if err != nil {
+		t.Errorf("failed, err:%v", err)
+	} else {
+		t.Logf("success, result:%+v", result)
+	}
+}
+
 func TestNew(t *testing.T) {
 	var ctx = context.Background()
 	cli, err := NewRedis(Config{
