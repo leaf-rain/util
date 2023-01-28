@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"time"
 )
 
 type tt struct {
@@ -11,13 +12,14 @@ type tt struct {
 }
 
 func main() {
-	var a = []int32{1, 2, 56, 3, 8, 5, 3}
-	Sort(a)
-	fmt.Println(a)
-
-	for i := 0; i <= 3; i += 2 {
-		fmt.Println(i)
-	}
+	defer func() {
+		fmt.Println("正常打印")
+	}()
+	go func() {
+		time.Sleep(time.Second * 2)
+		panic("测试恐慌")
+	}()
+	time.Sleep(time.Second * 5)
 }
 
 func Sort(data []int32) {

@@ -19,7 +19,7 @@ func TestMain(m *testing.M) {
 	client, err = redis.NewRedis(redis.Config{
 		PoolSize: 5,
 		Addr: []string{
-			"192.168.1.111:6379",
+			"192.168.31.250:6379",
 		},
 		DialTimeout: time.Second * 10,
 	}, ctx)
