@@ -5,18 +5,12 @@ import (
 )
 
 func TestEncode(t *testing.T) {
-	var testStruct = tts{}
-	testStruct.Values = &ts{
-		Name: "李四",
-		Age:  20,
-	}
-	testStruct.Map = make(map[int]interface{})
-	testStruct.Map[1] = 2
-	testStruct.Map[2] = 3
-	err := Encode(testStruct)
-	if err != nil {
-		t.Errorf("failed, err:%+v", err)
+	var testStruct = Request{}
+	testStruct.Ping = "ping"
+	result := Encode(&testStruct)
+	if result == nil {
+		t.Errorf("failed, err:%+v", result)
 	} else {
-		t.Logf("success !!!")
+		t.Logf("success !!! result:%+v", result)
 	}
 }

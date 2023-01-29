@@ -11,6 +11,14 @@ var (
 	ErrNotFound = errors.New("查询结果为0")
 )
 
+var (
+	Nil = []byte("null")
+)
+
+const (
+	TagName = "json"
+)
+
 func Storge(ctx context.Context, redisClient redis.Cmdable, key string, data ...interface{}) error {
 	if len(data) == 1 {
 		data = Encode(data[0])

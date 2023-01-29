@@ -3,7 +3,9 @@ package struct_to_map
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gogo/protobuf/proto"
 	"reflect"
+	"unicode"
 )
 
 func checkType(value reflect.Value) bool {
@@ -38,19 +40,40 @@ func Encode(data interface{}) []interface{} {
 		valueOf = valueOf.Elem()
 	}
 	var length = typeOf.NumField()
-	var filter = make([]interface{}, length*2)
+	var filter = make([]interface{}, 0)
+	var ok bool
+	var fieldName string
 	for i := 0; i < length; i++ {
-		filter[i*2] = typeOf.Field(i).Name
-		var value = valueOf.FieldByName(typeOf.Field(i).Name)
+		fieldName = typeOf.Field(i).Name
+		if !unicode.IsUpper([]rune(fieldName)[0]) {
+			continue
+		}
+		var value = valueOf.Field(i)
 		if !checkType(value) {
-			js, err := json.Marshal(value.Interface())
+			var itf = value.Interface()
+			var js []byte
+			var err error
+			var pm proto.Message
+			if pm, ok = itf.(proto.Message); ok {
+				if itf != nil && !value.IsNil() {
+					js, err = proto.Marshal(pm)
+				} else {
+					js = Nil
+				}
+			} else {
+				js, err = json.Marshal(itf)
+			}
 			if err != nil {
 				fmt.Println(err)
+				continue
 			}
-			filter[i*2+1] = js
+			filter = append(filter, GetTagByField(typeOf.Field(i), TagName))
+			filter = append(filter, js)
 		} else {
-			filter[i*2+1] = value.Interface()
+			filter = append(filter, GetTagByField(typeOf.Field(i), TagName))
+			filter = append(filter, value.Interface())
 		}
+		//filter[i*2] = typeOf.Field(i).Name
 	}
 	return filter
 }

@@ -29,35 +29,11 @@ func TestMain(m *testing.M) {
 	fmt.Println("函数运行耗时：", time.Since(now))
 }
 
-type ts struct {
-	Name string `json:"Name,omitempty"`
-	Age  int64  `json:"Age,omitempty"`
-}
-
-type tts struct {
-	Name   string              `json:"Name,omitempty"`
-	Age    int64               `json:"Age,omitempty"`
-	Values *ts                 `json:"Values,omitempty"`
-	Slice  []int               `json:"Slice"`
-	Map    map[int]interface{} `json:"Map"`
-}
-
 var key = "abc"
 
 func TestStorge(t *testing.T) {
-	var testStruct = tts{
-		Name:  "张三",
-		Age:   30,
-		Slice: []int{1, 2, 3},
-	}
-	testStruct.Values = &ts{
-		Name: "李四",
-		Age:  40,
-	}
-	testStruct.Map = make(map[int]interface{})
-	testStruct.Map[1] = 2
-	testStruct.Map[2] = 3
-	err := Storge(ctx, client, key, testStruct)
+	var testStruct = Request{Ping: "ping"}
+	err := Storge(ctx, client, key, &testStruct)
 	if err != nil {
 		t.Errorf("failed, err:%+v", err)
 	} else {
@@ -66,13 +42,12 @@ func TestStorge(t *testing.T) {
 }
 
 func TestFind(t *testing.T) {
-	var result tts
-	err := Find(ctx, client, &result, key, []string{"Slice"})
+	var result Request
+	err := Find(ctx, client, &result, key, []string{})
 	if err != nil {
 		t.Errorf("failed, err:%+v", err)
 	} else {
 		t.Logf("success !!! result :%+v", result)
-		t.Logf("success !!! result.Slice :%+v", result.Slice)
-		t.Logf("success !!! result.Values :%+v", result.Values)
+		t.Logf("success !!! result.ConfInfo :%+v", result.Ping)
 	}
 }

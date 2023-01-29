@@ -3,7 +3,6 @@ package struct_to_map
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"sync"
 )
 
@@ -22,7 +21,7 @@ func (s *structMap) get(t reflect.Type) *structSpec {
 		return v.(*structSpec)
 	}
 
-	spec := newStructSpec(t, "json")
+	spec := newStructSpec(t, TagName)
 	s.m.Store(t, spec)
 	return spec
 }
@@ -47,16 +46,10 @@ func newStructSpec(t reflect.Type, fieldTag string) *structSpec {
 	for i := 0; i < numField; i++ {
 		f := t.Field(i)
 
-		tag := f.Tag.Get(fieldTag)
-		if tag == "" || tag == "-" {
-			continue
-		}
-
-		tag = strings.Split(tag, ",")[0]
+		tag := GetTagByField(f, fieldTag)
 		if tag == "" {
 			continue
 		}
-
 		// Use the built-in decoder.
 		out.set(tag, &structField{index: i, fn: decoders[f.Type.Kind()]})
 	}

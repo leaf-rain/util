@@ -3,6 +3,7 @@ package struct_to_map
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gogo/protobuf/proto"
 	"reflect"
 	"strconv"
 )
@@ -26,18 +27,18 @@ var (
 		reflect.Uint64:        decodeUint64,
 		reflect.Float32:       decodeFloat32,
 		reflect.Float64:       decodeFloat64,
-		reflect.Complex64:     decodeJson,
-		reflect.Complex128:    decodeJson,
-		reflect.Array:         decodeJson,
-		reflect.Chan:          decodeJson,
-		reflect.Func:          decodeJson,
-		reflect.Interface:     decodeJson,
-		reflect.Map:           decodeJson,
-		reflect.Ptr:           decodeJson,
+		reflect.Complex64:     decodeAny,
+		reflect.Complex128:    decodeAny,
+		reflect.Array:         decodeAny,
+		reflect.Chan:          decodeAny,
+		reflect.Func:          decodeAny,
+		reflect.Interface:     decodeAny,
+		reflect.Map:           decodeAny,
+		reflect.Ptr:           decodeAny,
 		reflect.Slice:         decodeSlice,
 		reflect.String:        decodeString,
-		reflect.Struct:        decodeJson,
-		reflect.UnsafePointer: decodeJson,
+		reflect.Struct:        decodeAny,
+		reflect.UnsafePointer: decodeAny,
 	}
 
 	// Global map of struct field specs that is populated once for every new
@@ -177,21 +178,28 @@ func decodeSlice(f reflect.Value, s string) error {
 	if f.Type().Elem().Kind() == reflect.Uint8 {
 		f.SetBytes([]byte(s))
 	} else {
-		decodeJson(f, s)
+		return decodeAny(f, s)
 	}
 	return nil
 }
 
-func decodeJson(f reflect.Value, s string) error {
+func decodeAny(f reflect.Value, s string) error {
+	if s == string(Nil) {
+		return nil
+	}
 	var i = f.Interface()
-	rType := reflect.TypeOf(i)
+	rType := reflect.TypeOf(i).Elem()
 	newElem := reflect.New(rType)
-	i = newElem.Interface()
-	err := json.Unmarshal([]byte(s), &i)
+	i2 := newElem.Interface()
+	var err error
+	if pm, ok := i2.(proto.Message); ok {
+		err = proto.Unmarshal([]byte(s), pm)
+	} else {
+		err = json.Unmarshal([]byte(s), &i2)
+	}
 	if err != nil {
 		return err
 	}
-	newElem = newElem.Elem()
 	f.Set(newElem)
 	return nil
 }
