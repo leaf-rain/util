@@ -13,22 +13,29 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 )
 
-type Option struct {
+type Config struct {
 	Secret    string   // 密钥
 	Urls      string   // 路径
-	AtMobiles []string // @的手机号
-	AtUserIds []string // @的用户id
+	AtMobiles []string // @的手机号（固定）
+	AtUserIds []string // @的用户id（固定）
+}
+
+type Option struct {
+	AtMobiles []string // @的手机号（额外添加）
+	AtUserIds []string // @的用户id（额外添加）
 }
 
 type DingSrv struct {
-	opt *Option
+	opt  *Config
+	lock *sync.Mutex // 锁
 }
 
-func NewDingSrv(opt *Option) DingSrv {
-	return DingSrv{opt: opt}
+func NewDingSrv(opt *Config) DingSrv {
+	return DingSrv{opt: opt, lock: new(sync.Mutex)}
 }
 
 type ResultForDingDing struct {
@@ -36,9 +43,17 @@ type ResultForDingDing struct {
 	Errmsg  string `json:"errmsg"`
 }
 
-func (d DingSrv) DingdingSend(message string) (bool, error) {
+func (d DingSrv) DingdingSend(message string, opt ...Option) (bool, error) {
+	d.lock.Lock()
+	defer d.lock.Unlock()
 	var reqUrl = d.opt.Urls + sign(d.opt.Secret)
-	var request, err = newRequestBody(d.opt.AtMobiles, d.opt.AtUserIds, message, false)
+	var AtMobiles []string
+	var AtUserIds []string
+	for _, item := range opt {
+		AtMobiles = append(d.opt.AtMobiles, item.AtMobiles...)
+		AtUserIds = append(d.opt.AtUserIds, item.AtUserIds...)
+	}
+	var request, err = newRequestBody(AtMobiles, AtUserIds, message, false)
 	if err != nil {
 		log.GetLogger().Error("[DingdingSend] newRequestBody failed",
 			zap.Any("setting", d.opt),
