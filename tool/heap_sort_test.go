@@ -3,10 +3,26 @@ package tool
 import "testing"
 
 func Test_heapSort(t *testing.T) {
-	var arm Heap = []float64{9.9, 8.8, 7.7, 6.7, 5.5, 1, 2, 3, 4, 0}
+	var arm Heap = []HeapInfo{
+		{
+			Score: 9,
+		},
+		{
+			Score: 8,
+		},
+		{
+			Score: 1000,
+		},
+		{
+			Score: 1,
+		},
+	}
 	arm.Init()
 	t.Logf("%v", arm)
-	arm.Push(10.999)
+	arm.Push(HeapInfo{
+		Score: 1000000000,
+		Param: nil,
+	})
 	t.Logf("%v", arm)
 
 }

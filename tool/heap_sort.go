@@ -2,7 +2,12 @@ package tool
 
 // 本例为最大堆
 // 最小堆只需要修改less函数即可
-type Heap []float64
+type Heap []HeapInfo
+
+type HeapInfo struct {
+	Score int64
+	Param interface{}
+}
 
 func (h Heap) Init() {
 	n := len(h)
@@ -14,16 +19,16 @@ func (h Heap) Init() {
 
 // 注意go中所有参数转递都是值传递
 // 所以要让h的变化在函数外也起作用，此处得传指针
-func (h *Heap) Push(x float64) {
+func (h *Heap) Push(x HeapInfo) {
 	*h = append(*h, x)
 	h.up(len(*h) - 1)
 }
 
 // 删除堆中位置为i的元素
 // 返回被删元素的值
-func (h *Heap) Remove(i int) (float64, bool) {
+func (h *Heap) Remove(i int) (*HeapInfo, bool) {
 	if i < 0 || i > len(*h)-1 {
-		return 0, false
+		return nil, false
 	}
 	n := len(*h) - 1
 	h.swap(i, n) // 用最后的元素值替换被删除元素
@@ -31,16 +36,16 @@ func (h *Heap) Remove(i int) (float64, bool) {
 	x := (*h)[n]
 	*h = (*h)[0:n]
 	// 如果当前元素大于父结点，向下筛选
-	if (*h)[i] > (*h)[(i-1)/2] {
+	if (*h)[i].Score > (*h)[(i-1)/2].Score {
 		h.down(i)
 	} else { // 当前元素小于父结点，向上筛选
 		h.up(i)
 	}
-	return x, true
+	return &x, true
 }
 
 // 弹出堆顶的元素，并返回其值
-func (h *Heap) Pop() float64 {
+func (h *Heap) Pop() HeapInfo {
 	n := len(*h) - 1
 	h.swap(0, n)
 	x := (*h)[n]
@@ -83,5 +88,5 @@ func (h Heap) swap(i, j int) {
 }
 
 func (h Heap) less(i, j int) bool {
-	return h[i] > h[j]
+	return h[i].Score > h[j].Score
 }
