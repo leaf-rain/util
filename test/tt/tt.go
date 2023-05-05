@@ -11,12 +11,9 @@ type tt struct {
 }
 
 func main() {
-	var a = tt{
-		A: 100,
-		B: "",
-	}
-	ta(&a)
-	fmt.Println(a)
+	var a []int64
+	v := append([]int64{1, 2, 3}, a...)
+	fmt.Println(v)
 }
 
 func ta(a *tt) {
