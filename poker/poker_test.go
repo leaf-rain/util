@@ -13,3 +13,9 @@ func TestMain(m *testing.M) {
 	m.Run()
 	fmt.Println("执行耗时:", time.Since(now))
 }
+
+func Test_Poker(t *testing.T) {
+	p.StorageBaseCards(Cards)
+	result := p.HintCardCombo(Cards, 41040034)
+	t.Log(result)
+}

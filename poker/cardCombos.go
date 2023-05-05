@@ -35,7 +35,7 @@ type cardCombo struct {
 // numCards: 传入的牌的值
 // feature: 需要对比的牌的特征值。如果为 0 则表示所有的牌型都可以使用。
 // priority: 优先级；1 单牌优先；2 其他牌优先；
-func (p *Poker) HintCardCombo(numCards []int64, feature int64, priority int64) *CardCombo {
+func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 	var cards = p.NumToCard(numCards)
 	p.SortCards(cards)
 	if feature == 0 {
@@ -175,6 +175,16 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64, priority int64) *
 	return nil
 }
 
+// HaveJoker 拥有王炸
+func (p *Poker) HaveJoker(cards []*Card) bool {
+	p.SortCards(cards)
+	var length = len(cards)
+	if length < 2 || cards[length-1].Value < littleKing || cards[length-2].Value < littleKing {
+		return false
+	}
+	return true
+}
+
 // GetMinLaizi 获取最小的癞子
 func (p *Poker) GetMinLaizi(cards []*Card, num int64) []*Card {
 	if num == 0 || len(cards) == 0 {
@@ -245,7 +255,7 @@ func (p *Poker) GetMinBomb(cards []*Card, feature int64, isJoker bool) *cardComb
 	if isJoker {
 		var bombs = p.GetCards(cards, littleKing, 0)
 		bombs = append(bombs, p.GetCards(cards, bigKing, 0)...)
-		if len(bombs) > 2 {
+		if len(bombs) >= 2 {
 			cardType, section, cardValue, fix = p.isJokePair(bombs)
 			newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
 			if p.CompareFeature(newFeature, feature) == Greater {
@@ -266,9 +276,10 @@ func (p *Poker) GetMinSingle(cards []*Card, feature int64, bomb, divide, laizi b
 	var cardType, section, cardValue, fix int64
 	var newFeature int64
 	var tmpCards []*Card
+	var haveJoker = p.HaveJoker(cards)
 	// 先找单牌
 	for i := range vs {
-		if vs[i].isLaizi { // 不用癞子
+		if vs[i].isLaizi || (haveJoker && vs[i].value >= littleKing) { // 不用癞子
 			continue
 		}
 		if vs[i].times == 1 {
@@ -294,7 +305,7 @@ func (p *Poker) GetMinSingle(cards []*Card, feature int64, bomb, divide, laizi b
 	// 拆牌
 	if divide {
 		for i := len(vs) - 1; i >= 0; i-- {
-			if vs[i].isLaizi || vs[i].times >= 4 || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
+			if vs[i].isLaizi || vs[i].times >= 4 || (vs[i].value >= littleKing && vs[i].times > 1) || (haveJoker && vs[i].value >= littleKing) { // 不用癞子和不拆炸弹
 				continue
 			}
 			var tmpCard = p.CardBinarySearch(cards, vs[i].value)
@@ -318,7 +329,7 @@ func (p *Poker) GetMinSingle(cards []*Card, feature int64, bomb, divide, laizi b
 	// 使用癞子
 	if laizi && laiziCount > 0 {
 		for i := len(vs) - 1; i >= 0; i-- {
-			if vs[i].isLaizi {
+			if vs[i].isLaizi || (haveJoker && vs[i].value >= littleKing) {
 				var tmpCard = p.CardBinarySearch(cards, vs[i].value)
 				if tmpCard.IsUse {
 					continue
@@ -356,9 +367,10 @@ func (p *Poker) GetMinOnePair(cards []*Card, feature int64, bomb, divide, laizi 
 	var cardType, section, cardValue, fix int64
 	var newFeature int64
 	var tmpCards []*Card
+	var haveJoker = p.HaveJoker(cards)
 	// 先找不用癞子的对子
 	for i := range vs {
-		if vs[i].isLaizi { // 不用癞子
+		if vs[i].isLaizi || (haveJoker && vs[i].value >= littleKing) { // 不用癞子
 			continue
 		}
 		if vs[i].times == 2 {
@@ -385,7 +397,7 @@ func (p *Poker) GetMinOnePair(cards []*Card, feature int64, bomb, divide, laizi 
 	// 拆牌
 	if divide {
 		for i := len(vs) - 1; i >= 0; i-- {
-			if vs[i].isLaizi || vs[i].times >= 4 || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
+			if vs[i].isLaizi || vs[i].times >= 4 || (vs[i].value >= littleKing && vs[i].times > 1) || (haveJoker && vs[i].value >= littleKing) { // 不用癞子和不拆炸弹
 				continue
 			}
 			if vs[i].times > 2 {
@@ -414,7 +426,7 @@ func (p *Poker) GetMinOnePair(cards []*Card, feature int64, bomb, divide, laizi 
 		var result *cardCombo
 		var needLaizi int64 = 3 // 给默认值
 		for i := len(vs) - 1; i >= 0; i-- {
-			if vs[i].isLaizi && vs[i].times > 2 {
+			if vs[i].isLaizi && vs[i].times > 2 || (haveJoker && vs[i].value >= littleKing) {
 				continue
 			}
 			var tmpNeedLaizi = 2 - vs[i].times
@@ -463,9 +475,10 @@ func (p *Poker) GetMinTrio(cards []*Card, feature int64, bomb, divide, laizi boo
 	var cardType, section, cardValue, fix int64
 	var newFeature int64
 	var tmpCards []*Card
+	var haveJoker = p.HaveJoker(cards)
 	// 不用癞子
 	for i := range vs {
-		if vs[i].isLaizi { // 不用癞子
+		if vs[i].isLaizi || (haveJoker && vs[i].value >= littleKing) { // 不用癞子
 			continue
 		}
 		if vs[i].times == 3 {
@@ -497,7 +510,7 @@ func (p *Poker) GetMinTrio(cards []*Card, feature int64, bomb, divide, laizi boo
 		var result *cardCombo
 		var needLaizi int64 = 4 // 给默认值
 		for i := len(vs) - 1; i >= 0; i-- {
-			if vs[i].isLaizi && vs[i].times > 3 {
+			if vs[i].isLaizi && vs[i].times > 3 || (haveJoker && vs[i].value >= littleKing) {
 				continue
 			}
 			var tmpNeedLaizi = 3 - vs[i].times
