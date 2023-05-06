@@ -118,16 +118,17 @@ func (p *Poker) EncodeFeature(cardType int64, section int, cardValue int64, fix 
 // DecodeFeature 解析特征值
 // feature: 特征值
 // return: 1: 卡牌组合类型；2: 节数；3: 牌值
-func (p *Poker) DecodeFeature(feature int64) (int64, int, int64) {
+func (p *Poker) DecodeFeature(feature int64) (int64, int, int64, int64) {
 	if feature == 0 {
-		return 0, 0, 0
+		return 0, 0, 0, 0
 	}
 	cardType := feature / 1000000
 	feature = feature % 1000000
 	section := int(feature / 10000)
 	feature = feature % 10000
 	cardValue := feature / 10
-	return cardType, section, cardValue
+	fix := feature % 10
+	return cardType, section, cardValue, fix
 }
 
 // CompareFeature 比较特征值
@@ -142,8 +143,8 @@ func (p *Poker) CompareFeature(curFeature, lastFeature int64) int64 {
 		return Greater
 	}
 	var result int64
-	fType, fSection, fValue := p.DecodeFeature(curFeature)
-	tType, tSection, tValue := p.DecodeFeature(lastFeature)
+	fType, fSection, fValue, fFix := p.DecodeFeature(curFeature)
+	tType, tSection, tValue, tFix := p.DecodeFeature(lastFeature)
 	if fType == JokePair {
 		if tType == JokePair {
 			if fSection > tSection {
@@ -155,14 +156,16 @@ func (p *Poker) CompareFeature(curFeature, lastFeature int64) int64 {
 		return Greater
 	}
 
-	// 组合类型相同，检查具体值
-	if fType == tType && fSection == tSection {
-		result = Less
-		// 要出的牌比目标牌型大
-		if fValue > tValue {
-			result = Greater
+	// 两个数量不同的炸弹比较
+	if fType == tType && fType == Bomb {
+		if fFix > tFix && fSection == tSection {
+			return Greater
 		}
-		return int64(result)
+		if fSection > tSection {
+			return Greater
+		} else {
+			return Less
+		}
 	}
 
 	// 类型不同，出牌为炸弹
@@ -175,13 +178,14 @@ func (p *Poker) CompareFeature(curFeature, lastFeature int64) int64 {
 		return result
 	}
 
-	// 两个数量不同的炸弹比较
-	if fType == tType && fType == Bomb {
-		if fSection > tSection {
-			return Greater
-		} else {
-			return Less
+	// 组合类型相同，检查具体值
+	if fType == tType && fSection == tSection {
+		result = Less
+		// 要出的牌比目标牌型大
+		if fValue > tValue {
+			result = Greater
 		}
+		return int64(result)
 	}
 
 	if fType != tType || fSection != tSection {

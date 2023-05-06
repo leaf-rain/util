@@ -129,7 +129,7 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 			}
 		}
 	} else {
-		cType, _, _ := p.DecodeFeature(feature)
+		cType, _, _, _ := p.DecodeFeature(feature)
 		var result *cardCombo
 		switch {
 		case cType == Single || feature == 0: // 单张
@@ -209,21 +209,28 @@ func (p *Poker) GetMinLaizi(cards []*Card, num int64) []*Card {
 	return nil
 }
 
-// GetMinBomb 获取最小的炸弹，用于接非炸弹的牌，如果要接炸弹，用其它算法
+// GetMinBomb 获取最小的炸弹
 func (p *Poker) GetMinBomb(cards []*Card, feature int64, isJoker bool) *cardCombo {
 	// 优先使用癞子炸弹
 	vs, laiziCount, _ := cardsToValueSetOnLaizi(cards)
 	valueSetSort(vs) // 按照次数排序
 	var cardType, section, cardValue, fix int64
 	var newFeature int64
+	var tmpType, tmpSection, _, _ = p.DecodeFeature(feature)
+	if tmpType == Bomb && tmpSection != 0 {
+		tmpSection++
+	} else {
+		tmpSection = 4
+	}
+
 	for i := len(vs) - 1; i >= 0; i-- {
-		if vs[i].isLaizi || vs[i].times >= 4 || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
+		if vs[i].isLaizi || vs[i].times >= int64(tmpSection) || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
 			continue
 		}
 		var bombCards []*Card
-		if vs[i].times+laiziCount >= 4 {
+		if vs[i].times+laiziCount >= int64(tmpSection) {
 			bombCards = append(bombCards, p.GetCards(cards, vs[i].value, 0)...)
-			bombCards = append(bombCards, p.GetCardsForLaizi(cards, 4-vs[i].times)...)
+			bombCards = append(bombCards, p.GetCardsForLaizi(cards, int64(tmpSection)-vs[i].times)...)
 			cardType, section, cardValue, fix = p.isBomb(bombCards)
 			newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
 			if p.CompareFeature(newFeature, feature) == Greater {
@@ -236,10 +243,10 @@ func (p *Poker) GetMinBomb(cards []*Card, feature int64, isJoker bool) *cardComb
 	}
 	// 使用硬炸
 	for i := len(vs) - 1; i >= 0; i-- {
-		if vs[i].times < 4 || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
+		if vs[i].times < int64(tmpSection) || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
 			continue
 		}
-		if vs[i].times+laiziCount >= 4 {
+		if vs[i].times >= int64(tmpSection) {
 			var outCards = p.GetCards(cards, vs[i].value, 0)
 			cardType, section, cardValue, fix = p.isBomb(outCards)
 			newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
@@ -560,7 +567,7 @@ func (p *Poker) GetMinTrioWithSingle(cards []*Card, feature int64, bomb, divide,
 	var newFeature int64
 	var tmpCards []*Card
 	// 分解特征值
-	var _, _, baseValue = p.DecodeFeature(feature)
+	var _, _, baseValue, _ = p.DecodeFeature(feature)
 	var tmpValue = p.EncodeFeature(Trio, 1, baseValue, FixNo)
 	// 先找不用癞子的
 	var trio = p.GetMinTrio(cards, tmpValue, false, false, false)
@@ -638,14 +645,14 @@ func (p *Poker) GetMinTrioWithPair(cards []*Card, feature int64, bomb, divide, l
 	var newFeature int64
 	var tmpCards []*Card
 	// 分解特征值
-	var _, _, baseValue = p.DecodeFeature(feature)
+	var _, _, baseValue, _ = p.DecodeFeature(feature)
 	var tmpValue = p.EncodeFeature(Trio, 1, baseValue, FixNo)
 	// 先找不用癞子的
 	var trio = p.GetMinTrio(cards, tmpValue, false, false, false)
-	var single = p.GetMinOnePair(cards, 0, false, false, false)
-	if trio != nil && single != nil {
-		tmpCards = append(trio.Cards, single.Cards...)
-		cardType, section, cardValue, fix = p.isTrioWithSingle(tmpCards)
+	var tmp = p.GetMinOnePair(cards, 0, false, false, false)
+	if trio != nil && tmp != nil {
+		tmpCards = append(trio.Cards, tmp.Cards...)
+		cardType, section, cardValue, fix = p.isTrioWithPair(tmpCards)
 		newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
 		if p.CompareFeature(newFeature, feature) == Greater {
 			for i1 := range tmpCards {
@@ -661,10 +668,10 @@ func (p *Poker) GetMinTrioWithPair(cards []*Card, feature int64, bomb, divide, l
 	// divide 拆牌，但是不拆炸弹
 	if divide {
 		trio = p.GetMinTrio(cards, tmpValue, false, true, false)
-		single = p.GetMinOnePair(cards, 0, false, true, false)
-		if trio != nil && single != nil {
-			tmpCards = append(trio.Cards, single.Cards...)
-			cardType, section, cardValue, fix = p.isTrioWithSingle(tmpCards)
+		tmp = p.GetMinOnePair(cards, 0, false, true, false)
+		if trio != nil && tmp != nil {
+			tmpCards = append(trio.Cards, tmp.Cards...)
+			cardType, section, cardValue, fix = p.isTrioWithPair(tmpCards)
 			newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
 			if p.CompareFeature(newFeature, feature) == Greater {
 				for i1 := range tmpCards {
@@ -681,10 +688,10 @@ func (p *Poker) GetMinTrioWithPair(cards []*Card, feature int64, bomb, divide, l
 	// 使用癞子
 	if laizi {
 		trio = p.GetMinTrio(cards, tmpValue, false, false, true)
-		single = p.GetMinOnePair(cards, 0, false, false, true)
-		if trio != nil && single != nil {
-			tmpCards = append(trio.Cards, single.Cards...)
-			cardType, section, cardValue, fix = p.isTrioWithSingle(tmpCards)
+		tmp = p.GetMinOnePair(cards, 0, false, false, true)
+		if trio != nil && tmp != nil {
+			tmpCards = append(trio.Cards, tmp.Cards...)
+			cardType, section, cardValue, fix = p.isTrioWithPair(tmpCards)
 			newFeature = p.EncodeFeature(cardType, int(section), cardValue, fix)
 			if p.CompareFeature(newFeature, feature) == Greater {
 				for i1 := range tmpCards {
@@ -717,7 +724,7 @@ func (p *Poker) GetMinSingleStraight(cards []*Card, feature int64, bomb, divide,
 	var newFeature int64
 	var tmpCards []*Card
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	if baseSection == 0 {
 		baseSection = len(cards)
 	}
@@ -862,7 +869,7 @@ func (p *Poker) GetMinPairStraight(cards []*Card, feature int64, bomb, divide, l
 	var newFeature int64
 	var tmpCards []*Card
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	if baseSection == 0 {
 		baseSection = len(cards) / 2
 	}
@@ -1013,7 +1020,7 @@ func (p *Poker) GetMinTrioStraight(cards []*Card, feature int64, bomb, divide, l
 	var newFeature int64
 	var tmpCards []*Card
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	if baseSection == 0 {
 		baseSection = len(cards) / 3
 	}
@@ -1131,14 +1138,14 @@ func (p *Poker) GetMinTrioStraightWithSingle(cards []*Card, feature int64, bomb,
 	var tmpSeciton int
 	p.UnUse(cards)
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	var trioFeature = p.EncodeFeature(Trio, baseSection, baseValue, FixNo)
 	// 不拆牌和不使用癞子
 	var trio = p.GetMinTrio(cards, trioFeature, false, false, false)
 	if trio != nil {
 		tmpCards = append(tmpCards, trio.Cards...)
 		p.Use(cards, tmpCards)
-		_, tmpSeciton, _ = p.DecodeFeature(trioFeature)
+		_, tmpSeciton, _, _ = p.DecodeFeature(trioFeature)
 		for i := 0; i < tmpSeciton; i++ {
 			single := p.GetMinSingle(cards, 0, false, true, true)
 			if single != nil {
@@ -1168,7 +1175,7 @@ func (p *Poker) GetMinTrioStraightWithSingle(cards []*Card, feature int64, bomb,
 		if trio != nil {
 			tmpCards = append(tmpCards, trio.Cards...)
 			p.Use(cards, tmpCards)
-			_, tmpSeciton, _ = p.DecodeFeature(trioFeature)
+			_, tmpSeciton, _, _ = p.DecodeFeature(trioFeature)
 			for i := 0; i < tmpSeciton; i++ {
 				single := p.GetMinSingle(cards, 0, false, true, true)
 				if single != nil {
@@ -1214,14 +1221,14 @@ func (p *Poker) GetMinTrioStraightWithPair(cards []*Card, feature int64, bomb, d
 	var tmpSeciton int
 	p.UnUse(cards)
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	var trioFeature = p.EncodeFeature(Trio, baseSection, baseValue, FixNo)
 	// 不拆牌和不使用癞子
 	var trio = p.GetMinTrio(cards, trioFeature, false, false, false)
 	if trio != nil {
 		tmpCards = append(tmpCards, trio.Cards...)
 		p.Use(cards, tmpCards)
-		_, tmpSeciton, _ = p.DecodeFeature(trioFeature)
+		_, tmpSeciton, _, _ = p.DecodeFeature(trioFeature)
 		for i := 0; i < tmpSeciton; i++ {
 			single := p.GetMinOnePair(cards, 0, false, true, true)
 			if single != nil {
@@ -1251,7 +1258,7 @@ func (p *Poker) GetMinTrioStraightWithPair(cards []*Card, feature int64, bomb, d
 		if trio != nil {
 			tmpCards = append(tmpCards, trio.Cards...)
 			p.Use(cards, tmpCards)
-			_, tmpSeciton, _ = p.DecodeFeature(trioFeature)
+			_, tmpSeciton, _, _ = p.DecodeFeature(trioFeature)
 			for i := 0; i < tmpSeciton; i++ {
 				single := p.GetMinOnePair(cards, 0, false, true, true)
 				if single != nil {
@@ -1296,7 +1303,7 @@ func (p *Poker) GetMinFourWithTwoSingle(cards []*Card, feature int64, bomb, divi
 	var flag bool
 	p.UnUse(cards)
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	var trioFeature = p.EncodeFeature(Trio, baseSection, baseValue, FixNo)
 	// 不拆牌和不使用癞子
 	var trio = p.GetMinBomb(cards, trioFeature, false)
@@ -1376,7 +1383,7 @@ func (p *Poker) GetMinFourWithTwoPair(cards []*Card, feature int64, bomb, divide
 	var flag bool
 	p.UnUse(cards)
 	// 分解特征值
-	var _, baseSection, baseValue = p.DecodeFeature(feature)
+	var _, baseSection, baseValue, _ = p.DecodeFeature(feature)
 	var trioFeature = p.EncodeFeature(Trio, baseSection, baseValue, FixNo)
 	// 不拆牌和不使用癞子
 	var trio = p.GetMinBomb(cards, trioFeature, false)

@@ -15,7 +15,11 @@ func TestMain(m *testing.M) {
 }
 
 func Test_Poker(t *testing.T) {
-	p.StorageBaseCards(Cards)
-	result := p.HintCardCombo(Cards, 41040034)
+	p.SetLaizi([]int64{4})
+	var c1 = []int64{61, 62, 63, 41}
+	feature := p.GetCardsFeature(c1)
+	t.Log(feature)
+	var cards = []int64{51, 52, 53, 54}
+	result := p.HintCardCombo(cards, feature)
 	t.Log(result)
 }
