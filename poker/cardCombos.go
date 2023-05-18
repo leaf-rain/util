@@ -38,7 +38,7 @@ type cardCombo struct {
 func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 	var cards = p.NumToCard(numCards)
 	p.SortCards(cards)
-	if feature == 0 {
+	if feature == 0 { // 没有比较牌，自己出牌，优先出数量比较大的牌
 		// 飞机带对
 		rs := p.GetMinTrioStraightWithPair(cards, feature, false, false, false)
 		if rs != nil {

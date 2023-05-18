@@ -10,6 +10,13 @@ func (p *Poker) GetLaizi() []int64 {
 
 func (p *Poker) SetLaizi(data []int64) {
 	p.laizi = data
+	for i1 := range data {
+		for i2 := range p.baseCards {
+			if p.baseCards[i2].Value == data[i1] {
+				p.baseCards[i2].IsLaizi = true
+			}
+		}
+	}
 	return
 }
 
@@ -18,6 +25,13 @@ func (p *Poker) AppendLaizi(data []int64) {
 	sort.SliceIsSorted(p.laizi, func(i, j int) bool { // 排序
 		return p.laizi[i] < p.laizi[j]
 	})
+	for i1 := range data {
+		for i2 := range p.baseCards {
+			if p.baseCards[i2].Value == data[i1] {
+				p.baseCards[i2].IsLaizi = true
+			}
+		}
+	}
 	return
 }
 
@@ -37,6 +51,11 @@ func (p *Poker) AutoLaizi(num int64) { // num:癞子数量
 	p.laizi = make([]int64, p.laiNum)
 	for i := range cards {
 		p.laizi[i] = cards[i].Value
+		for i2 := range p.baseCards {
+			if p.baseCards[i2].Value == cards[i].Value {
+				p.baseCards[i2].IsLaizi = true
+			}
+		}
 	}
 }
 
