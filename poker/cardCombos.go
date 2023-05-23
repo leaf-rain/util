@@ -34,13 +34,13 @@ type cardCombo struct {
 // HintCardCombo 返回传入的牌中所有可用的牌型组合
 // numCards: 传入的牌的值
 // feature: 需要对比的牌的特征值。如果为 0 则表示所有的牌型都可以使用。
-// priority: 优先级；1 单牌优先；2 其他牌优先；
 func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 	var cards = p.NumToCard(numCards)
 	p.SortCards(cards)
 	if feature == 0 { // 没有比较牌，自己出牌，优先出数量比较大的牌
 		// 飞机带对
-		rs := p.GetMinTrioStraightWithPair(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs := p.GetMinTrioStraightWithPair(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -49,7 +49,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 飞机带单张
-		rs = p.GetMinTrioStraightWithSingle(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinTrioStraightWithSingle(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -58,7 +59,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 飞机
-		rs = p.GetMinTrioStraight(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinTrioStraight(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -67,7 +69,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 连对
-		rs = p.GetMinPairStraight(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinPairStraight(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -76,7 +79,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 顺子
-		rs = p.GetMinSingleStraight(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinSingleStraight(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -85,7 +89,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 三带一
-		rs = p.GetMinTrioWithSingle(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinTrioWithSingle(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -94,7 +99,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 三带对
-		rs = p.GetMinTrioWithPair(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinTrioWithPair(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -103,16 +109,8 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 三条
-		rs = p.GetMinTrio(cards, feature, false, false, false)
-		if rs != nil {
-			return &CardCombo{
-				Feature: rs.Feature,
-				Cards:   p.CardToNum(rs.Cards),
-			}
-		}
-
-		// 单张，不拆牌
-		rs = p.GetMinSingle(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinTrio(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -121,7 +119,18 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 
 		// 对子
-		rs = p.GetMinOnePair(cards, feature, false, false, false)
+		p.UnUse(cards)
+		rs = p.GetMinOnePair(cards, feature, true, true, true)
+		if rs != nil {
+			return &CardCombo{
+				Feature: rs.Feature,
+				Cards:   p.CardToNum(rs.Cards),
+			}
+		}
+
+		// 单张
+		p.UnUse(cards)
+		rs = p.GetMinSingle(cards, feature, false, true, true)
 		if rs != nil {
 			return &CardCombo{
 				Feature: rs.Feature,
@@ -131,31 +140,32 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 	} else {
 		cType, _, _, _ := p.DecodeFeature(feature)
 		var result *cardCombo
+		p.UnUse(cards)
 		switch {
 		case cType == Single || feature == 0: // 单张
-			result = p.GetMinSingle(cards, feature, false, false, true)
+			result = p.GetMinSingle(cards, feature, true, true, true)
 		case cType == OnePair: // 一对
-			result = p.GetMinOnePair(cards, feature, false, false, true)
+			result = p.GetMinOnePair(cards, feature, true, true, true)
 		case cType == Trio: // 三条
-			result = p.GetMinTrio(cards, feature, false, false, true)
+			result = p.GetMinTrio(cards, feature, true, true, true)
 		case cType == TrioWithSingle: // 三带单
-			result = p.GetMinTrioWithSingle(cards, feature, false, false, true)
+			result = p.GetMinTrioWithSingle(cards, feature, true, true, true)
 		case cType == TrioWithPair: // 三带对
-			result = p.GetMinTrioWithPair(cards, feature, false, false, true)
+			result = p.GetMinTrioWithPair(cards, feature, true, true, true)
 		case cType == FourWithTwoSingle: // 四带单
-			result = p.GetMinFourWithTwoSingle(cards, feature, false, false, true)
+			result = p.GetMinFourWithTwoSingle(cards, feature, true, true, true)
 		case cType == FourWithTwoPair: // 四带对
-			result = p.GetMinFourWithTwoPair(cards, feature, false, false, true)
+			result = p.GetMinFourWithTwoPair(cards, feature, true, true, true)
 		case cType == SingleStraight: // 单顺
-			result = p.GetMinSingleStraight(cards, feature, false, false, true)
+			result = p.GetMinSingleStraight(cards, feature, true, true, true)
 		case cType == PairStraight: // 连对
-			result = p.GetMinPairStraight(cards, feature, false, false, true)
+			result = p.GetMinPairStraight(cards, feature, true, true, true)
 		case cType == TrioStraight: // 飞机
-			result = p.GetMinTrioStraight(cards, feature, false, false, true)
+			result = p.GetMinTrioStraight(cards, feature, true, true, true)
 		case cType == TrioStraightWithSingle: // 飞机带单
-			result = p.GetMinTrioStraightWithSingle(cards, feature, false, false, true)
+			result = p.GetMinTrioStraightWithSingle(cards, feature, true, true, true)
 		case cType == TrioStraightWithPair: // 飞机带对
-			result = p.GetMinTrioStraightWithPair(cards, feature, false, false, true)
+			result = p.GetMinTrioStraightWithPair(cards, feature, true, true, true)
 		}
 		if result != nil {
 			return &CardCombo{
@@ -165,6 +175,7 @@ func (p *Poker) HintCardCombo(numCards []int64, feature int64) *CardCombo {
 		}
 	}
 	// 炸弹
+	p.UnUse(cards)
 	rs := p.GetMinBomb(cards, feature, true)
 	if rs != nil {
 		return &CardCombo{
@@ -216,12 +227,7 @@ func (p *Poker) GetMinBomb(cards []*Card, feature int64, isJoker bool) *cardComb
 	valueSetSort(vs) // 按照次数排序
 	var cardType, section, cardValue, fix int64
 	var newFeature int64
-	var tmpType, tmpSection, _, _ = p.DecodeFeature(feature)
-	if tmpType == Bomb && tmpSection != 0 {
-		tmpSection++
-	} else {
-		tmpSection = 4
-	}
+	var _, tmpSection, _, _ = p.DecodeFeature(feature)
 
 	for i := len(vs) - 1; i >= 0; i-- {
 		if vs[i].isLaizi || vs[i].times >= int64(tmpSection) || (vs[i].value >= littleKing && vs[i].times > 1) { // 不用癞子和不拆炸弹
@@ -738,7 +744,7 @@ func (p *Poker) GetMinSingleStraight(cards []*Card, feature int64, bomb, divide,
 		flag = true
 		tmpCards = nil
 		if vs[i].times == 1 && i+baseSection < len(vs) {
-			for i1 := i - 1; i1 > i-baseSection && vs[i1].times == 1 && !vs[i1].isLaizi && i1 >= 0; i1-- {
+			for i1 := i - 1; i1 > i-baseSection && i1 >= 1 && vs[i1].times == 1 && !vs[i1].isLaizi; i1-- {
 				if vs[i1].value != vs[i1-1].value+1 || vs[i1].value >= two {
 					flag = false
 					break
@@ -775,7 +781,7 @@ func (p *Poker) GetMinSingleStraight(cards []*Card, feature int64, bomb, divide,
 			flag = true
 			tmpCards = nil
 			if vs[i].times < 4 && i+baseSection < len(vs) {
-				for i1 := i - 1; i1 > i-baseSection && vs[i1].times < 4 && !vs[i1].isLaizi && i1 >= 0; i1-- {
+				for i1 := i - 1; i1 > i-baseSection && i1 >= 1 && vs[i1].times < 4 && !vs[i1].isLaizi; i1-- {
 					if vs[i1].value != vs[i1-1].value+1 || vs[i1].value >= two {
 						flag = false
 						break
@@ -814,7 +820,7 @@ func (p *Poker) GetMinSingleStraight(cards []*Card, feature int64, bomb, divide,
 			flag = true
 			tmpCards = nil
 			if vs[i].times < 4 {
-				for i1 := i - 1; i1 > i-baseSection && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0 && i1 >= 0; i1-- {
+				for i1 := i - 1; i1 > i-baseSection && i1 >= 1 && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0; i1-- {
 					if i1 < len(vs) && vs[i1].value < two && vs[i1].value == vs[i1-1].value+1 {
 						tmpCards = append(tmpCards, p.GetCards(cards, vs[i1].value, 1)...)
 					} else {
@@ -883,7 +889,7 @@ func (p *Poker) GetMinPairStraight(cards []*Card, feature int64, bomb, divide, l
 		flag = true
 		tmpCards = nil
 		if vs[i].times == 2 && i+baseSection < len(vs) {
-			for i1 := i - 1; i1 > i-baseSection && vs[i1].times == 1 && !vs[i1].isLaizi && i1 >= 0; i1-- {
+			for i1 := i - 1; i1 > i-baseSection && i1 >= 1 && vs[i1].times == 1 && !vs[i1].isLaizi; i1-- {
 				if vs[i1].value != vs[i1-1].value+1 || vs[i1].value >= two {
 					flag = false
 					break
@@ -920,7 +926,7 @@ func (p *Poker) GetMinPairStraight(cards []*Card, feature int64, bomb, divide, l
 			flag = true
 			tmpCards = nil
 			if vs[i].times < 4 && i+baseSection < len(vs) {
-				for i1 := i - 1; i1 > i-baseSection && vs[i1].times < 4 && !vs[i1].isLaizi && i1 >= 0; i1-- {
+				for i1 := i - 1; i1 > i-baseSection && i1 >= 1 && vs[i1].times < 4 && !vs[i1].isLaizi; i1-- {
 					if vs[i1].value != vs[i1-1].value+1 || vs[i1].value >= two {
 						flag = false
 						break
@@ -959,7 +965,7 @@ func (p *Poker) GetMinPairStraight(cards []*Card, feature int64, bomb, divide, l
 			flag = true
 			tmpCards = nil
 			if vs[i].times < 4 {
-				for i1 := i - 1; i1 < i-baseSection && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0 && i1 >= 0; i1-- {
+				for i1 := i - 1; i1 < i-baseSection && i1 >= 1 && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0; i1-- {
 					if i1 < len(vs) && vs[i1].value < two && vs[i1].value == vs[i1-1].value+1 {
 						if tmpLaiziCount < 2-vs[i1].times {
 							break
@@ -1034,7 +1040,7 @@ func (p *Poker) GetMinTrioStraight(cards []*Card, feature int64, bomb, divide, l
 		flag = true
 		tmpCards = nil
 		if vs[i].times == 3 && i+baseSection < len(vs) {
-			for i1 := i + 1; i1 < i+baseSection && vs[i1].times == 1 && !vs[i1].isLaizi && i1 >= 0; i1++ {
+			for i1 := i + 1; i1 < i+baseSection && i1 >= 1 && vs[i1].times == 1 && !vs[i1].isLaizi; i1++ {
 				if vs[i1].value != vs[i1-1].value+1 || vs[i1].value >= two {
 					flag = false
 					break
@@ -1074,7 +1080,7 @@ func (p *Poker) GetMinTrioStraight(cards []*Card, feature int64, bomb, divide, l
 			flag = true
 			tmpCards = nil
 			if vs[i].times < 4 {
-				for i1 := i - 1; i1 < i-baseSection && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0 && i1 >= 0; i1-- {
+				for i1 := i - 1; i1 < i-baseSection && i1 >= 1 && vs[i1].times < 4 && !vs[i1].isLaizi && tmpLaiziCount >= 0; i1-- {
 					if i1 < len(vs) && vs[i1].value < two && vs[i1].value == vs[i1-1].value+1 {
 						if tmpLaiziCount < 3-vs[i1].times {
 							break

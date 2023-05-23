@@ -34,21 +34,25 @@ func (p *Poker) isBomb(cards []*Card) (int64, int64, int64, int64) {
 		fix = FixHave
 	}
 	if laiziCount == int64(len(cards)) { // 全是癞子的炸弹需要判断，如果全是同类型的癞子则当成没有癞子的炸弹打出
-		fix = FixNo
+		fix = FixAll
 		for i := range cards {
 			if cards[i].Value != cards[0].Value {
-				fix = FixHave
+				fix = FixBlend
 			}
 		}
 	}
-	if length > 1 { // 除去赖子只可能剩1种牌型
+	if int64(length)-laiziCount > 1 { // 除去赖子只可能剩1种牌型
 		return 0, 0, 0, 0
 	}
+	var cardsLen = int64(len(cards))
+	if cardsLen == 4 {
+
+	}
 	if length == 1 {
-		return Bomb, int64(len(cards) - 1), vs[0].value, fix
+		return Bomb, int64(len(cards)), vs[0].value, fix
 	} else {
 		p.SortCards(cards)
-		return Bomb, int64(len(cards) - 1), cards[len(cards)-1].Value, fix
+		return Bomb, int64(len(cards)), cards[len(cards)-1].Value, fix
 	}
 }
 

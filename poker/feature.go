@@ -1,28 +1,37 @@
 package poker
 
+import "github.com/zeromicro/go-zero/core/logx"
+
 const (
 	LastUnConf int64 = -100 // 上家出牌不符合（游戏bug）
 	Less       int64 = -1   // 出牌比上家小
 	UnConf     int64 = 0    // 不符合牌型规则
 	Greater    int64 = 1    // 出牌比上家大
 
-	// fix: 1:带有癞子牌，3:纯癞子，4：默认没有癞子牌
-	FixHave int64 = 1
-	FixAll  int64 = 3
-	FixNo   int64 = 4
+	// fix: 1:带有癞子牌，2：混合纯软炸，3:纯癞子，4：默认没有癞子牌
+	FixHave  int64 = 1
+	FixBlend int64 = 2
+	FixAll   int64 = 3
+	FixNo    int64 = 4
 )
 
 // GetCardsFeature 获取牌型特征值
 // nCards: 计算牌型的卡牌数据
 // comboType: 牌的类型
 // return: 牌型特征值
-func (p *Poker) GetCardsFeature(nCards []int64) int64 {
+func (p *Poker) GetCardsFeature(nCards []int64, comboType int64) int64 {
+	logx.Debugf("[GetCardsFeature] (%v, %v), laizi:%+v", nCards, comboType, p.laizi)
 	var length = len(nCards)
 	cards := p.NumToCard(nCards)
+	if comboType != 0 {
+		return p.getCardsFeature(cards, comboType)
+	}
 	var cardType, section, cardValue, fix int64
 	switch length {
 	case 1: // 一张牌出现的情况只有单牌
-		return Single
+		if cardType, section, cardValue, fix = p.isSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
 	case 2: // 两张牌出现的情况： 王炸、对子
 		if cardType, section, cardValue, fix = p.isJokePair(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
@@ -61,9 +70,6 @@ func (p *Poker) GetCardsFeature(nCards []int64) int64 {
 		if cardType, section, cardValue, fix = p.isBomb(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
-		if cardType, section, cardValue, fix = p.isFourWithTwoSingle(cards); cardType != 0 {
-			return p.EncodeFeature(cardType, int(section), cardValue, fix)
-		}
 		if cardType, section, cardValue, fix = p.isTrioStraight(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
@@ -73,14 +79,17 @@ func (p *Poker) GetCardsFeature(nCards []int64) int64 {
 		if cardType, section, cardValue, fix = p.isSingleStraight(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
-	case 8: // 六张牌出现的情况： 炸弹、四带2单、飞机不带、连队、顺子
+		if cardType, section, cardValue, fix = p.isFourWithTwoSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case 8: // 八张牌出现的情况： 炸弹、四带2对、飞机不带、连队、顺子
 		if cardType, section, cardValue, fix = p.isJokePair(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
 		if cardType, section, cardValue, fix = p.isBomb(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
-		if cardType, section, cardValue, fix = p.isFourWithTwoPair(cards); cardType != 0 {
+		if cardType, section, cardValue, fix = p.isTrioStraightWithSingle(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
 		if cardType, section, cardValue, fix = p.isPairStraight(cards); cardType != 0 {
@@ -89,7 +98,7 @@ func (p *Poker) GetCardsFeature(nCards []int64) int64 {
 		if cardType, section, cardValue, fix = p.isSingleStraight(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
-		if cardType, section, cardValue, fix = p.isTrioStraightWithSingle(cards); cardType != 0 {
+		if cardType, section, cardValue, fix = p.isFourWithTwoPair(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
 	default:
@@ -112,6 +121,72 @@ func (p *Poker) GetCardsFeature(nCards []int64) int64 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
 		if cardType, section, cardValue, fix = p.isSingleStraight(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	}
+	return 0
+}
+
+func (p *Poker) getCardsFeature(cards []*Card, comboType int64) int64 {
+	if comboType == 0 {
+		return 0
+	}
+	var cardType, section, cardValue, fix int64
+	switch comboType {
+	case Single:
+		if cardType, section, cardValue, fix = p.isSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case OnePair:
+		if cardType, section, cardValue, fix = p.isOnePair(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case Trio:
+		if cardType, section, cardValue, fix = p.isTrio(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case TrioWithSingle:
+		if cardType, section, cardValue, fix = p.isTrioWithSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case TrioWithPair:
+		if cardType, section, cardValue, fix = p.isTrioWithPair(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case FourWithTwoSingle:
+		if cardType, section, cardValue, fix = p.isFourWithTwoSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case FourWithTwoPair:
+		if cardType, section, cardValue, fix = p.isFourWithTwoPair(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case SingleStraight:
+		if cardType, section, cardValue, fix = p.isSingleStraight(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case PairStraight:
+		if cardType, section, cardValue, fix = p.isPairStraight(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case TrioStraight:
+		if cardType, section, cardValue, fix = p.isTrioStraight(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case TrioStraightWithSingle:
+		if cardType, section, cardValue, fix = p.isTrioStraightWithSingle(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case TrioStraightWithPair:
+		if cardType, section, cardValue, fix = p.isTrioStraightWithPair(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case Bomb:
+		if cardType, section, cardValue, fix = p.isBomb(cards); cardType != 0 {
+			return p.EncodeFeature(cardType, int(section), cardValue, fix)
+		}
+	case JokePair:
+		if cardType, section, cardValue, fix = p.isJokePair(cards); cardType != 0 {
 			return p.EncodeFeature(cardType, int(section), cardValue, fix)
 		}
 	}
@@ -166,9 +241,7 @@ func (p *Poker) CompareFeature(curFeature, lastFeature int64) int64 {
 	tType, tSection, tValue, tFix := p.DecodeFeature(lastFeature)
 	if fType == JokePair {
 		if tType == JokePair {
-			if fSection > tSection {
-				return Greater
-			} else {
+			if fSection < tSection {
 				return Less
 			}
 		}
@@ -177,10 +250,22 @@ func (p *Poker) CompareFeature(curFeature, lastFeature int64) int64 {
 
 	// 两个数量不同的炸弹比较
 	if fType == tType && fType == Bomb {
-		if fFix > tFix && fSection == tSection {
+		if fFix == FixAll && tFix != FixAll && fSection == tSection { // 纯软炸 > 混合纯软炸||硬炸||软炸
 			return Greater
 		}
-		if fSection > tSection {
+		if fFix == FixBlend && (tFix == FixNo || tFix == FixHave) && fSection == tSection { // 混合纯软炸 > 硬炸||软炸
+			return Greater
+		}
+		if fFix == FixNo && tFix == FixHave && fSection == tSection { // 硬炸 > 软炸
+			return Greater
+		}
+		//if fFix > tFix && fSection == tSection { // 硬炸 > 软炸
+		//	return Greater
+		//}
+		if fValue > tValue && fSection == tSection && fFix == tFix { // 相同数量炸弹比较大小
+			return Greater
+		}
+		if fSection > tSection { // 比较炸弹数量
 			return Greater
 		} else {
 			return Less

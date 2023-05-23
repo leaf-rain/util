@@ -1,20 +1,8 @@
 package poker
 
-import (
-	"fmt"
-	"testing"
-	"time"
-)
+import "testing"
 
-var p = NewPokerAlgorithm()
-
-func TestMain(m *testing.M) {
-	var now = time.Now()
-	m.Run()
-	fmt.Println("执行耗时:", time.Since(now))
-}
-
-func Test_Poker(t *testing.T) {
+func Test_HintCardCombo(t *testing.T) {
 	p.SetLaizi([]int64{15})
 	var c1 = []int64{152, 31, 32, 33}
 	feature := p.GetCardsFeature(c1, 0)

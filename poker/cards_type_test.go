@@ -3,11 +3,15 @@ package poker
 import "testing"
 
 func TestPoker_isBomb(t *testing.T) {
+	p.SetLaizi([]int64{3, 4})
 	var nCards = []int64{
 		31, 32, 33, 34,
 	}
 	var cards = p.NumToCard(nCards)
 	t.Log(p.isBomb(cards))
+	a, b, c, d := p.isBomb(cards)
+	t.Log(p.EncodeFeature(a, int(b), c, d))
+	t.Log(p.CompareFeature(41040054, 41040033))
 	nCards = []int64{
 		31, 32, 33, 54,
 	}
